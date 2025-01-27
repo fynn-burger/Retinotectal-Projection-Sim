@@ -90,6 +90,8 @@ class Simulation:
                                                self.reverse_sig, self.ff_inter, self.ft_inter, self.cis_inter, 0,
                                                self.num_steps, self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
 
+            print(gc.__str__())
+
     def iterate_simulation(self):
         """
         Iteratively processes each simulation step, generating random steps, and making stepping decisions.
@@ -113,6 +115,8 @@ class Simulation:
                                                         self.ft_inter, self.cis_inter, step_current, self.num_steps,
                                                         self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
                     self.step_decision(gc, pos_new, potential_new)
+                    if gc.id == 0 and (len(gc.history.potential) % 500) == 0:
+                        print(gc.__str__())
 
         progress = 100
         # TODO: @Performance Early stopping mechanism based on total potential

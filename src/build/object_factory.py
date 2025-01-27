@@ -137,6 +137,7 @@ def initialize_growth_cones(config):
     gc_l_min = config.get(cfg.GC_L_MIN)
     gc_r_max = config.get(cfg.GC_R_MAX)
     gc_l_max = config.get(cfg.GC_L_MAX)
+    rho = config.get(cfg.RHO)
 
     receptor_gradient = np.linspace(0, 1, gc_count) ** gc_r_steepness
     receptors = gc_r_min + receptor_gradient * (gc_r_max - gc_r_min)
@@ -150,7 +151,7 @@ def initialize_growth_cones(config):
     for i in range(gc_count):
         # Create a GrowthCone instance and initialize it
         pos_y = y_positions[i]
-        gc = GrowthCone((size, pos_y), size, ligands[i], receptors[i], i)
+        gc = GrowthCone((size, pos_y), size, ligands[i], receptors[i], i, rho)
         growth_cones.append(gc)
 
     return growth_cones

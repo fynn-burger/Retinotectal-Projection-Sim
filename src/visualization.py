@@ -28,7 +28,7 @@ def get_images_post(simulation, result):
         "trajectory_on_substrate": generate_image(visualize_trajectory_on_substrate, result,
                                                   simulation.substrate, simulation.growth_cones),
         "trajectories": generate_image(visualize_trajectories, simulation.growth_cones),
-        "adaptation": generate_image(visualize_adaptation, simulation.growth_cones)
+        "adaptation": generate_image(visualize_adaptation_1, simulation.growth_cones)
 
     }
 
@@ -77,8 +77,9 @@ def visualize_substrate_separately(substrate):
 
 
 def visualize_growth_cones(gcs):
-    receptors = np.array([gc.receptor_current for gc in gcs])
-    ligands = np.array([gc.ligand_current for gc in gcs])
+    # ToDo should be the sum of inner and outer receptors -> this does only work if rho = 1
+    receptors = np.array([gc.outer_receptor_current for gc in gcs])
+    ligands = np.array([gc.outer_ligand_current for gc in gcs])
 
     # Create the plot
     fig, ax = plt.subplots(figsize=(10, 7))
@@ -171,14 +172,14 @@ def visualize_trajectory_on_substrate(result, substrate, growth_cones, trajector
     return fig
 
 
-def visualize_adaptation(growth_cones):
+def visualize_adaptation_metrics(growth_cones):
     fig, axs = plt.subplots(2, 2, figsize=(12, 10))
-    max_steps = max(len(gc.history.potential) for gc in growth_cones)
+    # max_steps = max(len(gc.history.potential) for gc in growth_cones)
     metrics = [
         (axs[0, 0], "Potential", "Guidance Potentials", 'potential', 'linear'),
         (axs[0, 1], "Adaptation Coefficient", "Adaptation Coefficients", 'adap_co', 'linear'),
-        (axs[1, 0], "Ligand", "Ligand Value", 'ligand', 'log'),
-        (axs[1, 1], "Reset Force", "Reset Force for Ligand", 'reset_force_ligand', 'symlog')
+        (axs[1, 0], "Rho", "Rho", 'rho', 'linear'),
+        (axs[1, 1], "Reset Force", "Reset Force", 'reset_force', 'log')
     ]
     for ax, ylabel, title, metric, scale in metrics:
         for gc in growth_cones:
@@ -186,12 +187,41 @@ def visualize_adaptation(growth_cones):
         ax.set_xlabel('Step')
         ax.set_ylabel(ylabel)
         ax.set_title(title)
-        ax.set_xlim(0, max_steps)
+        #ax.set_xlim(0, max_steps)
         ax.set_yscale(scale)
-        ax.legend()
 
     plt.tight_layout()
     return fig
+
+
+def visualize_receptor_adaptation(growth_cones):
+    # max_steps = max(len(gc.history.potential) for gc in growth_cones)
+
+    # Outer receptors plot
+    fig_outer, ax_outer = plt.subplots(figsize=(12, 6))
+    for gc in growth_cones:
+        ax_outer.plot(getattr(gc.history, 'outer_receptor'), label=f"Growth Cone {gc.id}")
+    ax_outer.set_xlabel('Step')
+    ax_outer.set_ylabel('Outer Receptor Level')
+    ax_outer.set_title('Outer Receptors')
+    # ax_outer.set_xlim(0, max_steps)
+    ax_outer.set_yscale('log')  # If you want a logarithmic scale
+    #ax_outer.legend()
+    plt.tight_layout()
+
+    # Inner receptors plot
+    fig_inner, ax_inner = plt.subplots(figsize=(12, 6))
+    for gc in growth_cones:
+        ax_inner.plot(getattr(gc.history, 'inner_receptor'), label=f"Growth Cone {gc.id}")
+    ax_inner.set_xlabel('Step')
+    ax_inner.set_ylabel('Inner Receptor Level')
+    ax_inner.set_title('Inner Receptors')
+    # ax_inner.set_xlim(0, max_steps)
+    ax_inner.set_yscale('log')
+    #ax_inner.legend()
+    plt.tight_layout()
+
+    return fig_outer, fig_inner
 
 
 def create_blended_colors(ligands, receptors):

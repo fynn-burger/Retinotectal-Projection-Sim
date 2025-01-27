@@ -14,7 +14,10 @@ def run():
     vz.visualize_results_on_substrate(result, simulation.substrate).show()
     vz.visualize_trajectory_on_substrate(result, simulation.substrate, simulation.growth_cones).show()
     vz.visualize_trajectories(simulation.growth_cones).show()
-    vz.visualize_adaptation(simulation.growth_cones).show()
+    vz.visualize_adaptation_metrics(simulation.growth_cones).show()
+    outer, inner = vz.visualize_receptor_adaptation(simulation.growth_cones)
+    outer.show()
+    inner.show()
 
 
 if __name__ == '__main__':

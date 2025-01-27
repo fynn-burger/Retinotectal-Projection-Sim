@@ -16,8 +16,11 @@ def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inte
     ft_ligands, ft_receptors = (0, 0)
     ff_ligands, ff_receptors = (0, 0)
     ff_coef = 0
-    gc_receptor_sum = gc.receptor_current * gc.radius * gc.radius * math.pi
-    gc_ligand_sum = gc.ligand_current * gc.radius * gc.radius * math.pi
+
+    gc_outer_receptor_sum = gc.outer_receptor_current * gc.radius * gc.radius * math.pi
+    gc_outer_ligand_sum = gc.outer_ligand_current * gc.radius * gc.radius * math.pi
+    gc_inner_receptor_sum = gc.inner_receptor_current * gc.radius * gc.radius * math.pi
+    gc_inner_ligand_sum = gc.inner_ligand_current * gc.radius * gc.radius * math.pi
 
     # Compute interactions only if needed
     if ft_inter_on:
@@ -29,9 +32,17 @@ def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inte
     # Calculate the forward and reverse signals based on flags
     forward_sig = reverse_sig = 0
     if forward_on:
-        forward_sig = gc_receptor_sum * (ft_ligands + (gc_ligand_sum if cis_inter_on else 0) + (ff_coef * ff_ligands))
+        trans_sig = gc_outer_receptor_sum * ft_ligands
+        cis_sig = gc_inner_receptor_sum * gc_inner_ligand_sum if cis_inter_on else 0
+        ff_sig = gc_outer_receptor_sum * ff_coef * ff_ligands
+        forward_sig = trans_sig + cis_sig + ff_sig
+        # forward_sig = gc_outer_receptor_sum * (ft_ligands + (gc_inner_ligand_sum if cis_inter_on else 0) + (ff_coef * ff_ligands))
     if reverse_on:
-        reverse_sig = gc_ligand_sum * (ft_receptors + (gc_receptor_sum if cis_inter_on else 0) + (ff_coef * ff_receptors))
+        trans_sig = gc_outer_ligand_sum * ft_receptors
+        cis_sig = gc_inner_ligand_sum * gc_inner_receptor_sum if cis_inter_on else 0
+        ff_sig = gc_outer_ligand_sum * ff_coef * ff_receptors
+        reverse_sig = trans_sig + cis_sig + ff_sig
+        # reverse_sig = gc_outer_ligand_sum * (ft_receptors + (gc_inner_receptor_sum if cis_inter_on else 0) + (ff_coef * ff_receptors))
 
     # Round and calculate the potential
     forward_sig = float("{:.6f}".format(forward_sig))
@@ -86,8 +97,8 @@ def ff_interaction(gc1, pos, gcs):
         d = euclidean_distance(gc2.pos, pos)
         if d < gc1.radius * 2:
             area = intersection_area(pos, gc2.pos, gc1.radius)
-            sum_ligands += area * gc2.ligand_current
-            sum_receptors += area * gc2.receptor_current
+            sum_ligands += area * gc2.outer_ligand_current
+            sum_receptors += area * gc2.outer_receptor_current
 
     return sum_ligands, sum_receptors
 

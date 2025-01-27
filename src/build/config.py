@@ -35,6 +35,7 @@ GC_R_MIN = "receptor_min"
 GC_L_MIN = "ligand_min"
 GC_R_MAX = "receptor_max"
 GC_L_MAX = "ligand_max"
+RHO = "rho"
 
 # Adaptation
 ADAPTATION_ENABLED = "adaptation_enabled"
@@ -188,6 +189,7 @@ default_configs = {
         GC_L_MIN: 0.01,
         GC_R_MAX: 2.99,
         GC_L_MAX: 2.99,
+        RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
         SIGMOID_STEEPNESS: 4,
@@ -225,6 +227,7 @@ default_configs = {
         GC_L_MIN: 0.01,
         GC_R_MAX: 2.99,
         GC_L_MAX: 2.99,
+        RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
         SIGMOID_STEEPNESS: 4,
@@ -255,6 +258,7 @@ default_configs = {
         GC_L_MIN: 0.01,
         GC_R_MAX: 2.99,
         GC_L_MAX: 2.99,
+        RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
         SIGMOID_STEEPNESS: 4,
@@ -288,6 +292,7 @@ default_configs = {
         GC_L_MIN: 0.01,
         GC_R_MAX: 2.99,
         GC_L_MAX: 2.99,
+        RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
         SIGMOID_STEEPNESS: 4,
@@ -328,11 +333,11 @@ def get_default_config(substrate_type):
 """
 
 custom_config = {
-    GC_COUNT: 20,
+    GC_COUNT: 10,
     GC_SIZE: 3,
     STEP_SIZE: 1,
     STEP_NUM: 15000,
-    X_STEP_POSSIBILITY: 0.6,
+    X_STEP_POSSIBILITY: 0.55,
     Y_STEP_POSSIBILITY: 0.50,
     SIGMOID_STEEPNESS: 4,
     SIGMOID_SHIFT: 3,
@@ -343,6 +348,7 @@ custom_config = {
     GC_L_MIN: 0.01,
     GC_R_MAX: 1,
     GC_L_MAX: 1,
+    RHO: 1,
     SIGMA: 0.12,
     FORCE: False,
     FORWARD_SIG: True,
@@ -351,10 +357,10 @@ custom_config = {
     FT_INTER: True,
     CIS_INTER: True,
     ADAPTATION_ENABLED: True,
-    ADAPTATION_MU: 0.012,  # 0,006
-    ADAPTATION_LAMBDA: 0.0017,  # 0.0045
+    ADAPTATION_MU: 0.05,  # 0,006
+    ADAPTATION_LAMBDA: 0.00045,  # 0.0045
     ADAPTATION_HISTORY: 10,
-    SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
+    SUBSTRATE_TYPE: GAP_INV,
     ROWS: 100,
     COLS: 100,
 
@@ -378,8 +384,8 @@ custom_config = {
     GAP_END: 0.05,
     GAP_FIRST_BLOCK: RECEPTOR,
     GAP_SECOND_BLOCK: RECEPTOR,
-    GAP_FIRST_BLOCK_CONC: 2,
-    GAP_SECOND_BLOCK_CONC: 2
+    GAP_FIRST_BLOCK_CONC: 1,
+    GAP_SECOND_BLOCK_CONC: 1
 }
 
 """
