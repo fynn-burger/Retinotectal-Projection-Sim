@@ -56,7 +56,7 @@ class GrowthCone:
         """
         return (f"Receptor: {self.receptor}, Ligand: {self.ligand}, rho: {self.rho_current}, "
                 f"Outer_L: {self.outer_ligand_current}, Outer_R: {self.outer_receptor_current}, "
-                f"Inner_L: {self.inner_ligand_current}, Inner_R: {self.inner_receptor_current}"
+                f"Inner_L: {self.inner_ligand_current}, Inner_R: {self.inner_receptor_current}, "
                 f"Position: {self.pos}, "f"Start Position: {self.get_start_pos()}, Potential: {self.potential}, "
                 f"ID: {self.id}, Adaptation Coefficient: {self.adap_co}, "
                 f"Reset Force: {self.reset_force}")

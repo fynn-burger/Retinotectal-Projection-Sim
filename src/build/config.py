@@ -333,11 +333,11 @@ def get_default_config(substrate_type):
 """
 
 custom_config = {
-    GC_COUNT: 10,
-    GC_SIZE: 3,
+    GC_COUNT: 3,
+    GC_SIZE: 5,
     STEP_SIZE: 1,
-    STEP_NUM: 15000,
-    X_STEP_POSSIBILITY: 0.55,
+    STEP_NUM: 30000,
+    X_STEP_POSSIBILITY: 0.50,
     Y_STEP_POSSIBILITY: 0.50,
     SIGMOID_STEEPNESS: 4,
     SIGMOID_SHIFT: 3,
@@ -357,20 +357,20 @@ custom_config = {
     FT_INTER: True,
     CIS_INTER: True,
     ADAPTATION_ENABLED: True,
-    ADAPTATION_MU: 0.05,  # 0,006
+    ADAPTATION_MU: 0.1,  # 0,006
     ADAPTATION_LAMBDA: 0.00045,  # 0.0045
     ADAPTATION_HISTORY: 10,
-    SUBSTRATE_TYPE: GAP_INV,
+    SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
     ROWS: 100,
     COLS: 100,
 
     # Continuous substrate values
     CONT_GRAD_R_STEEPNESS: 1.4,
     CONT_GRAD_L_STEEPNESS: 1.4,
-    CONT_GRAD_R_MIN: 0.27,  # it is possible to use 0 -> Does this make sense
-    CONT_GRAD_L_MIN: 0.27,  # it is possible to use 0 -> Does this make sense
-    CONT_GRAD_R_MAX: 27,
-    CONT_GRAD_L_MAX: 27,
+    CONT_GRAD_R_MIN: 0.1,  # it is possible to use 0 -> Does this make sense
+    CONT_GRAD_L_MIN: 0.1,  # it is possible to use 0 -> Does this make sense
+    CONT_GRAD_R_MAX: 10,
+    CONT_GRAD_L_MAX: 10,
 
     # Stripe substrate values
     STRIPE_FWD: True,
@@ -384,8 +384,8 @@ custom_config = {
     GAP_END: 0.05,
     GAP_FIRST_BLOCK: RECEPTOR,
     GAP_SECOND_BLOCK: RECEPTOR,
-    GAP_FIRST_BLOCK_CONC: 1,
-    GAP_SECOND_BLOCK_CONC: 1
+    GAP_FIRST_BLOCK_CONC: 1.5,
+    GAP_SECOND_BLOCK_CONC: 1.5
 }
 
 """

@@ -108,15 +108,21 @@ class Simulation:
                         self.adapt_growth_cone(gc)
                     pos_new = self.gen_random_step(gc)
 
-                    # do NOT recalculate the current potential for reduced time-complexity
+                    # do NOT recalculate the current potential for reduced time-complexity -> Try calculating it again
+                    # I would do this
+                    gc.potential = calculate_potential(gc, gc.pos, self.growth_cones, self.substrate,
+                                                       self.forward_sig, self.reverse_sig, self.ff_inter,
+                                                       self.ft_inter, self.cis_inter, step_current, self.num_steps,
+                                                       self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
 
                     potential_new = calculate_potential(gc, pos_new, self.growth_cones, self.substrate,
                                                         self.forward_sig, self.reverse_sig, self.ff_inter,
                                                         self.ft_inter, self.cis_inter, step_current, self.num_steps,
                                                         self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
                     self.step_decision(gc, pos_new, potential_new)
-                    if gc.id == 0 and (len(gc.history.potential) % 500) == 0:
+                    if gc.id == 1 and (step_current % 500) == 0:
                         print(gc.__str__())
+                        print(potential_new)
 
         progress = 100
         # TODO: @Performance Early stopping mechanism based on total potential
