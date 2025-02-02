@@ -333,11 +333,11 @@ def get_default_config(substrate_type):
 """
 
 custom_config = {
-    GC_COUNT: 3,
-    GC_SIZE: 5,
+    GC_COUNT: 20,
+    GC_SIZE: 3,
     STEP_SIZE: 1,
-    STEP_NUM: 30000,
-    X_STEP_POSSIBILITY: 0.50,
+    STEP_NUM: 4000,
+    X_STEP_POSSIBILITY: 0.55,
     Y_STEP_POSSIBILITY: 0.50,
     SIGMOID_STEEPNESS: 4,
     SIGMOID_SHIFT: 3,
@@ -353,39 +353,39 @@ custom_config = {
     FORCE: False,
     FORWARD_SIG: True,
     REVERSE_SIG: True,
-    FF_INTER: True,
+    FF_INTER: False,
     FT_INTER: True,
     CIS_INTER: True,
     ADAPTATION_ENABLED: True,
-    ADAPTATION_MU: 0.1,  # 0,006
-    ADAPTATION_LAMBDA: 0.00045,  # 0.0045
+    ADAPTATION_MU: 0.096,  # 0,006
+    ADAPTATION_LAMBDA: 0.0008,  # 0.0045
     ADAPTATION_HISTORY: 10,
-    SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
+    SUBSTRATE_TYPE: STRIPE,
     ROWS: 100,
     COLS: 100,
 
     # Continuous substrate values
     CONT_GRAD_R_STEEPNESS: 1.4,
     CONT_GRAD_L_STEEPNESS: 1.4,
-    CONT_GRAD_R_MIN: 0.1,  # it is possible to use 0 -> Does this make sense
-    CONT_GRAD_L_MIN: 0.1,  # it is possible to use 0 -> Does this make sense
-    CONT_GRAD_R_MAX: 10,
-    CONT_GRAD_L_MAX: 10,
+    CONT_GRAD_R_MIN: 0.27,
+    CONT_GRAD_L_MIN: 0.27,
+    CONT_GRAD_R_MAX: 27,
+    CONT_GRAD_L_MAX: 27,
 
     # Stripe substrate values
     STRIPE_FWD: True,
-    STRIPE_REW: True,
-    STRIPE_LIGAND_CONC: 0.5,
-    STRIPE_RECEPTOR_CONC: 1,
+    STRIPE_REW: False,
+    STRIPE_LIGAND_CONC: 0.7,
+    STRIPE_RECEPTOR_CONC: 0.7,
     STRIPE_WIDTH: 6.625,
 
     # Gap substrate Values
     GAP_BEGIN: 0.6,
-    GAP_END: 0.05,
+    GAP_END: 0.06,
     GAP_FIRST_BLOCK: RECEPTOR,
     GAP_SECOND_BLOCK: RECEPTOR,
-    GAP_FIRST_BLOCK_CONC: 1.5,
-    GAP_SECOND_BLOCK_CONC: 1.5
+    GAP_FIRST_BLOCK_CONC: 0.001,
+    GAP_SECOND_BLOCK_CONC: 0.1
 }
 
 """

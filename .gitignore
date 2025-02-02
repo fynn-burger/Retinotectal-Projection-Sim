@@ -5,3 +5,5 @@
 .idea/workspace.xml
 /Results_Retinotectal_Simulations_Fynn/
 test.py
+test_potential calculation.py
+test_prob_density_Calculation.py

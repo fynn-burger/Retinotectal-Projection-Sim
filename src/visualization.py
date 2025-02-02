@@ -127,15 +127,19 @@ def visualize_projection(result, substrate, fit_type="linear", halved=False, mut
 
 
 def add_linear_regression(x, y):
-    slope, intercept, r_value, *_ = linregress(x, y)
-    regression_line = slope * x + intercept
-    correlation = r_value ** 2  # R² value
-    null_point_x = -intercept / slope if slope != 0 else None
+    try:
+        slope, intercept, r_value, *_ = linregress(x, y)
+        regression_line = slope * x + intercept
+        correlation = r_value ** 2  # R² value
+        null_point_x = -intercept / slope if slope != 0 else None
 
-    # Plot the regression line
-    plt.plot(x, regression_line, 'r-',
-             label=f'Linear Regression\nSlope: {slope:.2f}\n'
-                   f'R²: {correlation:.2f}\nNull Point X: {null_point_x:.2f}\nNull Point Y: {intercept:.2f}')
+        # Plot the regression line
+        plt.plot(x, regression_line, 'r-',
+                 label=f'Linear Regression\nSlope: {slope:.2f}\n'
+                       f'R²: {correlation:.2f}\nNull Point X: {null_point_x:.2f}\nNull Point Y: {intercept:.2f}')
+
+    except ValueError:
+        print ("clould not calculate linear regression")
 
 
 def add_polynomial_fit(x, y, mutated_indexes):
