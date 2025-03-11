@@ -120,9 +120,12 @@ class Simulation:
                                                         self.ft_inter, self.cis_inter, step_current, self.num_steps,
                                                         self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
                     self.step_decision(gc, pos_new, potential_new)
-                    if gc.id == 1 and (step_current % 500) == 0:
+                    if gc.id == 10 and (step_current % 100) == 0:
+                        print(step_current)
                         print(gc.__str__())
                         print(potential_new)
+                        if gc.potential == 0:
+                            print("0")
 
         progress = 100
         # TODO: @Performance Early stopping mechanism based on total potential

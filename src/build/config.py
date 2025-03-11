@@ -336,19 +336,19 @@ custom_config = {
     GC_COUNT: 20,
     GC_SIZE: 3,
     STEP_SIZE: 1,
-    STEP_NUM: 4000,
-    X_STEP_POSSIBILITY: 0.55,
-    Y_STEP_POSSIBILITY: 0.50,
+    STEP_NUM: 8000,
+    X_STEP_POSSIBILITY: 0.55,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
+    Y_STEP_POSSIBILITY: 0.50,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
     SIGMOID_STEEPNESS: 4,
     SIGMOID_SHIFT: 3,
-    SIGMOID_HEIGHT: 1,
+    SIGMOID_HEIGHT: 15,
     GC_R_STEEPNESS: 1.4,
     GC_L_STEEPNESS: 1.4,
     GC_R_MIN: 0.01,
     GC_L_MIN: 0.01,
     GC_R_MAX: 1,
     GC_L_MAX: 1,
-    RHO: 1,
+    RHO: 0.7,
     SIGMA: 0.12,
     FORCE: False,
     FORWARD_SIG: True,
@@ -360,7 +360,7 @@ custom_config = {
     ADAPTATION_MU: 0.096,  # 0,006
     ADAPTATION_LAMBDA: 0.0008,  # 0.0045
     ADAPTATION_HISTORY: 10,
-    SUBSTRATE_TYPE: STRIPE,
+    SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
     ROWS: 100,
     COLS: 100,
 
@@ -375,16 +375,16 @@ custom_config = {
     # Stripe substrate values
     STRIPE_FWD: True,
     STRIPE_REW: False,
-    STRIPE_LIGAND_CONC: 0.7,
-    STRIPE_RECEPTOR_CONC: 0.7,
+    STRIPE_LIGAND_CONC: 1,
+    STRIPE_RECEPTOR_CONC: 1,
     STRIPE_WIDTH: 6.625,
 
     # Gap substrate Values
-    GAP_BEGIN: 0.6,
+    GAP_BEGIN: 0.2,
     GAP_END: 0.06,
     GAP_FIRST_BLOCK: RECEPTOR,
     GAP_SECOND_BLOCK: RECEPTOR,
-    GAP_FIRST_BLOCK_CONC: 0.001,
+    GAP_FIRST_BLOCK_CONC: 1,
     GAP_SECOND_BLOCK_CONC: 0.1
 }
 

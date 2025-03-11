@@ -103,7 +103,7 @@ class GrowthCone:
             '''
 
             # Calculate resetting force depending on rho
-            self.reset_force = lambda_ * (self.get_start_rho() - self.rho_current)
+            self.reset_force = lambda_ * (1 - self.rho_current)
 
         self.history.update_adap_co(self.adap_co)
 
@@ -181,9 +181,6 @@ class GrowthCone:
     def get_start_receptor(self):
         return self.history.receptor[0]
     '''
-
-    def get_start_rho(self):
-        return self.history.rho[0]
 
 
 class History:
