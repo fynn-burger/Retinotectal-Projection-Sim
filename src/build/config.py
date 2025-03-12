@@ -328,15 +328,15 @@ def get_default_config(substrate_type):
 """
 
 custom_config = {
-    GC_COUNT: 20,
+    GC_COUNT: 50,
     GC_SIZE: 3,
     STEP_SIZE: 1,
-    STEP_NUM: 15000,
-    X_STEP_POSSIBILITY: 0.6,
+    STEP_NUM: 8000,
+    X_STEP_POSSIBILITY: 0.55,
     Y_STEP_POSSIBILITY: 0.50,
     SIGMOID_STEEPNESS: 4,
     SIGMOID_SHIFT: 3,
-    SIGMOID_HEIGHT: 1,
+    SIGMOID_HEIGHT: 100,
     GC_R_STEEPNESS: 1.4,
     GC_L_STEEPNESS: 1.4,
     GC_R_MIN: 0.01,
@@ -354,8 +354,8 @@ custom_config = {
     ADAPTATION_MU: 0.012,  # 0,006
     ADAPTATION_LAMBDA: 0.0017,  # 0.0045
     ADAPTATION_HISTORY: 10,
-    SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
-    ROWS: 100,
+    SUBSTRATE_TYPE: GAP_INV,
+    ROWS: 50,
     COLS: 100,
 
     # Continuous substrate values
@@ -374,12 +374,12 @@ custom_config = {
     STRIPE_WIDTH: 6.625,
 
     # Gap substrate Values
-    GAP_BEGIN: 0.6,
+    GAP_BEGIN: 0.2,
     GAP_END: 0.05,
     GAP_FIRST_BLOCK: RECEPTOR,
     GAP_SECOND_BLOCK: RECEPTOR,
-    GAP_FIRST_BLOCK_CONC: 2,
-    GAP_SECOND_BLOCK_CONC: 2
+    GAP_FIRST_BLOCK_CONC: 1.5,
+    GAP_SECOND_BLOCK_CONC: 1
 }
 
 """
