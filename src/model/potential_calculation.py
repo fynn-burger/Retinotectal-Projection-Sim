@@ -52,6 +52,7 @@ def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inte
     forward_sig = max(forward_sig, 0.0001)
     reverse_sig = max(reverse_sig, 0.0001)
 
+
     # Calculate and return the potential
     return abs(math.log(reverse_sig) - math.log(forward_sig))
 
@@ -152,7 +153,10 @@ def intersection_area(gc1_pos, gc2_pos, radius):
         return 0
     else:
         # Check figure intersection_area for visualization: sector = PBDC, triangle = PBEC
-        sector = radius ** 2 * math.acos(d / (2 * radius))
+        sector = 2 * radius ** 2 * math.acos(d / (2 * radius))
         triangle = 0.5 * d * math.sqrt(4 * radius ** 2 - d ** 2)
+        if sector < triangle:
+            print(sector, triangle)
         return (sector - triangle) * 2
+
 
