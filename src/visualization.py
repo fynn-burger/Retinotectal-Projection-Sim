@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
 import numpy as np
 from matplotlib.figure import Figure
 from scipy.stats import linregress
@@ -105,22 +106,28 @@ def visualize_results_on_substrate(result, substrate):
     return fig
 
 
-def visualize_projection(result, substrate, fit_type="linear", halved=False, mutated_indexes=None):
-    x_values, y_values = result.get_projection_id()
-    if halved:
-        x_values, y_values = result.get_projection_halved()
-    x_values_normalized = normalize_mapping(x_values, substrate.offset, substrate.cols - substrate.offset)
-    y_values_normalized = normalize_mapping(y_values, 0, len(y_values) - 1)
+def visualize_projection(result, substrate, fit_type="linear", gc_scope="full", substrate_scope="full"
+                         , mutated_indexes=None):
+    # get values
+    ap_values, nt_values = result.get_projection_id()
+    # normalize values
+    ap_values_normalized = normalize_mapping(ap_values, substrate.offset, substrate.cols - substrate.offset)
+    nt_values_normalized = normalize_mapping(nt_values, nt_values[0], nt_values[-1])
 
-    fig = visualize_data_points(x_values_normalized, y_values_normalized, "% a-p Axis of Target",
-                                "% n-t Axis of Retina", "Projection Mapping")
+    # create figure
+    fig = visualize_data_points(nt_values_normalized, ap_values_normalized,
+                                "% n-t Axis of Retina","% a-p Axis of Target", "Projection Mapping")
+    # calculate regression
     try:
         if fit_type == "linear":
-            add_linear_regression(x_values_normalized, y_values_normalized)
+            add_linear_regression(nt_values_normalized, ap_values_normalized)
         elif fit_type == "polyfit":
-            add_polynomial_fit(x_values_normalized, y_values_normalized, mutated_indexes)
-    except (ValueError) as e:
-        print ("could not calculate linear regression")
+            add_polynomial_fit(nt_values_normalized, ap_values_normalized, mutated_indexes)
+    except ValueError as e:
+        print("could not calculate linear regression")
+
+    if gc_scope != "full" or substrate_scope != "full":
+        create_halved_projection(gc_scope, substrate_scope)
 
     plt.legend()
     return fig
@@ -230,8 +237,12 @@ def visualize_receptor_adaptation(growth_cones):
 
 def create_blended_colors(ligands, receptors):
     # Normalize ligands and receptors to the range [0, 1] if they exceed 1
-    ligands = ligands / np.maximum(1, ligands.max())
-    receptors = receptors / np.maximum(1, receptors.max())
+    # Normalization changed, such that it normalizes depending on the absolute max value, for both sensor types
+    total_max = max(ligands.max(), receptors.max(), 1)
+
+    # Normalize both arrays using the total maximum
+    ligands = ligands / total_max
+    receptors = receptors / total_max
 
     blended_colors = np.ones(ligands.shape + (3,))
     blended_colors[..., 0] -= ligands * 0.1 + receptors * 0.9
@@ -261,3 +272,39 @@ def generate_image(visualization_func, *args):
     """
     fig = visualization_func(*args)
     return _generate_base64_image(fig)
+
+
+def create_halved_projection(gc_scope, substrate_scope):
+    ax = plt.gca()
+    y_min, y_max = ax.get_ylim()
+    x_min, x_max = ax.get_xlim()
+    if gc_scope == "nasal":
+        ax.set_xlim(x_min, x_max * 2)
+    elif gc_scope == "temporal":
+        ax.set_xlim(- (x_max - x_min), x_max)
+
+    if substrate_scope == "anterior":
+        ax.set_ylim(y_min, y_max * 2)
+    elif substrate_scope == "posterior":
+        ax.set_ylim(- (y_max - y_min), y_max)
+
+    x_min, x_max = ax.get_xlim()
+    y_min, y_max = ax.get_ylim()
+
+    x_ticks = np.linspace(x_min, x_max, 6)
+    y_ticks = np.linspace(y_min, y_max, 6)
+
+    ax.set_xticks(x_ticks)
+    ax.set_yticks(y_ticks)
+
+    def full_y_range_percentage(x, pos):
+        # Linear mapping: x = y_min -> 0%, x = y_max -> 100%
+        pct = (x - y_min) / (y_max - y_min) * 100
+        return f"{pct:.0f}%"
+    def full_x_range_percentage(x, pos):
+        # Linear mapping: x = y_min -> 0%, x = y_max -> 100%
+        pct = (x - x_min) / (x_max - x_min) * 100
+        return f"{pct:.0f}%"
+
+    ax.yaxis.set_major_formatter(mtick.FuncFormatter(full_y_range_percentage))
+    ax.xaxis.set_major_formatter(mtick.FuncFormatter(full_x_range_percentage))

@@ -5,6 +5,7 @@ import math
 import time
 from model.result import Result
 from model.potential_calculation import calculate_potential
+import visualization as vz
 import random
 
 progress = 0  # Global progress variable
@@ -42,7 +43,7 @@ class Simulation:
 
     def __init__(self, config, substrate, growth_cones, adaptation, step_size, num_steps, x_step_p, y_step_p, sigmoid_steepness,
                  sigmoid_shift, sigmoid_height, sigma, force, forward_sig, reverse_sig, ff_inter, ft_inter,cis_inter, mu, lambda_,
-                 history_length):
+                 history_length, interim_results, gc_scope, substrate_scope):
         self.config = config
         self.forward_sig = forward_sig
         self.reverse_sig = reverse_sig
@@ -64,6 +65,9 @@ class Simulation:
         self.mu = mu
         self.lambda_ = lambda_
         self.history_length = history_length
+        self.interim_results = interim_results
+        self.gc_scope = gc_scope
+        self.substrate_scope = substrate_scope
 
     def run(self):
         """
@@ -120,12 +124,18 @@ class Simulation:
                                                         self.ft_inter, self.cis_inter, step_current, self.num_steps,
                                                         self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
                     self.step_decision(gc, pos_new, potential_new)
-                    if gc.id == 10 and (step_current % 100) == 0:
+                    if gc.id == 30 and (step_current % 100) == 0:
                         print(step_current)
                         print(gc.__str__())
                         print(potential_new)
                         if gc.potential == 0:
                             print("0")
+
+            # show projection results based on array given in config
+            if step_current in self.interim_results:
+                # runtime should not be relevant -> set to 0
+                vz.visualize_projection(Result(self, 0, self.config), self.substrate,
+                                        gc_scope=self.gc_scope, substrate_scope=self.substrate_scope).show()
 
         progress = 100
         # TODO: @Performance Early stopping mechanism based on total potential

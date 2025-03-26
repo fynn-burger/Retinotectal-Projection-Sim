@@ -27,6 +27,7 @@ REVERSE_SIG = "reverse_sig"
 FF_INTER = "ff_inter"
 FT_INTER = "ft_inter"
 CIS_INTER = "cis_inter"
+INTERIM_RESULTS = "interim_results"
 
 # Growth Cones
 GC_R_STEEPNESS = "receptor_steepness"
@@ -36,6 +37,7 @@ GC_L_MIN = "ligand_min"
 GC_R_MAX = "receptor_max"
 GC_L_MAX = "ligand_max"
 RHO = "rho"
+GC_SCOPE = "gc_scope"
 
 # Adaptation
 ADAPTATION_ENABLED = "adaptation_enabled"
@@ -62,6 +64,7 @@ CONT_GRAD_R_MIN = "continuous_receptor_start"
 CONT_GRAD_L_MIN = "continuous_ligand_start"
 CONT_GRAD_R_MAX = "continuous_receptor_end"
 CONT_GRAD_L_MAX = "continuous_ligand_end"
+SUBSTRATE_SCOPE = "substrate_scope"
 # -----------   Wedges  -----------
 WEDGE_NARROW_EDGE = "wedge_narrow_edge"
 WEDGE_WIDE_EDGE = "wedge_wide_edge"
@@ -105,7 +108,8 @@ simulation_advanced = {
     FORWARD_SIG: True,
     REVERSE_SIG: True,
     FF_INTER: True,
-    FT_INTER: True
+    FT_INTER: True,
+    INTERIM_RESULTS: []
 }
 
 adaptation = {
@@ -127,6 +131,7 @@ continuous_substrate = {
     CONT_GRAD_L_MAX: 1,
     CONT_GRAD_R_STEEPNESS: 1,
     CONT_GRAD_L_STEEPNESS: 1,
+    SUBSTRATE_SCOPE: "full",
 
 }
 
@@ -206,6 +211,7 @@ default_configs = {
         ADAPTATION_MU: 0.01,
         ADAPTATION_LAMBDA: 0.0045,
         ADAPTATION_HISTORY: 50,
+        INTERIM_RESULTS: [],
         SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
         ROWS: 100,
         COLS: 100,
@@ -241,6 +247,7 @@ default_configs = {
         FT_INTER: True,
         CIS_INTER: True,
         ADAPTATION_ENABLED: False,
+        INTERIM_RESULTS: [],
         SUBSTRATE_TYPE: WEDGES,
         ROWS: 96,
         COLS: 96,
@@ -272,6 +279,7 @@ default_configs = {
         FT_INTER: True,
         CIS_INTER: True,
         ADAPTATION_ENABLED: False,
+        INTERIM_RESULTS: [],
         SUBSTRATE_TYPE: STRIPE,
         ROWS: 150,
         COLS: 150,
@@ -309,6 +317,7 @@ default_configs = {
         ADAPTATION_MU: 0.01,
         ADAPTATION_LAMBDA: 0.0045,
         ADAPTATION_HISTORY: 50,
+        INTERIM_RESULTS: [],
         SUBSTRATE_TYPE: GAP,
         ROWS: 96,
         COLS: 96,
@@ -334,54 +343,58 @@ def get_default_config(substrate_type):
 
 custom_config = {
     # GC Parameters
-    GC_COUNT: 50,
+    GC_COUNT: 100,
     GC_SIZE: 3,
-    GC_R_STEEPNESS: 1.4,
-    GC_L_STEEPNESS: 1.4,
+    GC_R_STEEPNESS: 3,
+    GC_L_STEEPNESS: 3,
     GC_R_MIN: 0.01,
-    GC_L_MIN: 0.01,
+    GC_L_MIN: 0.01, # 0.385 bei steepness 1,4
     GC_R_MAX: 1,
     GC_L_MAX: 1,
-    RHO: 0.7,
+    RHO: 0.7,  #0.7
 
     # Interaction Toggles
     FORWARD_SIG: True,
     REVERSE_SIG: True,
-    FF_INTER: True,
+    FF_INTER: False,
     FT_INTER: True,
     CIS_INTER: True,
 
     # Interaction Parameters
     SIGMOID_STEEPNESS: 4,
-    SIGMOID_SHIFT: 3,
-    SIGMOID_HEIGHT: 100,
+    SIGMOID_SHIFT: 1.75,
+    SIGMOID_HEIGHT: 10000,
 
     # Adaptation
     ADAPTATION_ENABLED: True,
-    ADAPTATION_MU: 0.096,  # 0,006
-    ADAPTATION_LAMBDA: 0.0008,  # 0.0045
+    ADAPTATION_MU: 0.096,
+    ADAPTATION_LAMBDA: 0.0008,
     ADAPTATION_HISTORY: 10,
 
     # Step Parameters
     STEP_SIZE: 1,
-    STEP_NUM: 8000,
-    X_STEP_POSSIBILITY: 0.55,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
+    STEP_NUM: 5000,
+    X_STEP_POSSIBILITY: 0.525,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
     Y_STEP_POSSIBILITY: 0.50,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
     SIGMA: 0.12,
     FORCE: False,
 
+    # Mapping results nach ... Schritten -> Zeigt nicht an nach wie vielen es ist im moment
+    INTERIM_RESULTS: [1000, 2000, 3000, 4000, 5000],
+
     # Substrate Basics
-    SUBSTRATE_TYPE: GAP_INV,
-    ROWS: 50,
-    COLS: 100,
+    SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
+    ROWS: 8,
+    COLS: 50,
 
     # Continuous substrate values
-    CONT_GRAD_R_STEEPNESS: 1.4,
-    CONT_GRAD_L_STEEPNESS: 1.4,
-    CONT_GRAD_R_MIN: 0.1,
-    CONT_GRAD_L_MIN: 0.1,
-    CONT_GRAD_R_MAX: 10,
-    CONT_GRAD_L_MAX: 10,
+    CONT_GRAD_R_STEEPNESS: 3,
+    CONT_GRAD_L_STEEPNESS: 3,
+    CONT_GRAD_R_MIN: 0.05, #1.94 für steepness 4 10,4 bei steepness 1,4
+    CONT_GRAD_L_MIN: 0.05, # Probiere noch unterschiedliche Steepnesses
+    CONT_GRAD_R_MAX: 5,
+    CONT_GRAD_L_MAX: 5,
+    SUBSTRATE_SCOPE: "full",
 
     # Stripe substrate values
     STRIPE_FWD: True,
@@ -395,8 +408,8 @@ custom_config = {
     GAP_END: 0.06,
     GAP_FIRST_BLOCK: RECEPTOR,
     GAP_SECOND_BLOCK: RECEPTOR,
-    GAP_FIRST_BLOCK_CONC: 10,
-    GAP_SECOND_BLOCK_CONC: 0.1
+    GAP_FIRST_BLOCK_CONC: 27,
+    GAP_SECOND_BLOCK_CONC: 1
 }
 
 """

@@ -48,6 +48,10 @@ def build_simulation(config) -> Simulation:
     lambda_ = 0
     history_length = 0
 
+    interim_results = config.get(cfg.INTERIM_RESULTS)
+    gc_scope = config.get(cfg.GC_SCOPE)
+    substrate_scope = config.get(cfg.SUBSTRATE_SCOPE)
+
     if adaptation:
         mu = config.get(cfg.ADAPTATION_MU)
         lambda_ = config.get(cfg.ADAPTATION_LAMBDA)
@@ -56,7 +60,7 @@ def build_simulation(config) -> Simulation:
     # Initialize the Simulation object with the new parameters
     simulation = Simulation(config, substrate, growth_cones, adaptation, step_size, num_steps, x_step_p, y_step_p,
                             sigmoid_steepness, sigmoid_shift, sigmoid_height, sigma, force, forward_sig, reverse_sig, ff_inter,
-                            ft_inter, cis_inter, mu, lambda_, history_length)
+                            ft_inter, cis_inter, mu, lambda_, history_length, interim_results, gc_scope, substrate_scope)
     return simulation
 
 
