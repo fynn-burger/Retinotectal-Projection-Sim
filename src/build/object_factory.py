@@ -75,16 +75,18 @@ def build_substrate(config):
     substrate_type = config.get(cfg.SUBSTRATE_TYPE)
 
     if substrate_type == cfg.CONTINUOUS_GRADIENTS:
-        cont_grad_r_min = config.get(cfg.CONT_GRAD_R_MIN)
-        cont_grad_l_min = config.get(cfg.CONT_GRAD_L_MIN)
-        cont_grad_r_max = config.get(cfg.CONT_GRAD_R_MAX)
-        cont_grad_l_max = config.get(cfg.CONT_GRAD_L_MAX)
-        cont_grad_r_steepness = config.get(cfg.CONT_GRAD_R_STEEPNESS)
-        cont_grad_l_steepness = config.get(cfg.CONT_GRAD_L_STEEPNESS)
-        substrate = ContinuousGradientSubstrate(rows, cols, offset, cont_grad_r_min=cont_grad_r_min,
-                                                cont_grad_l_min=cont_grad_l_min, cont_grad_r_max=cont_grad_r_max,
-                                                cont_grad_l_max=cont_grad_l_max,
-                                                cont_grad_r_steepness=cont_grad_r_steepness, cont_grad_l_steepness=cont_grad_l_steepness)
+        cont_grad_r_factor = config.get(cfg.CONT_GRAD_R_FACTOR)
+        cont_grad_l_factor = config.get(cfg.CONT_GRAD_L_FACTOR)
+        cont_grad_r_shift = config.get(cfg.CONT_GRAD_R_SHIFT)
+        cont_grad_l_shift = config.get(cfg.CONT_GRAD_L_SHIFT)
+        cont_grad_r_decay = config.get(cfg.CONT_GRAD_R_DECAY)
+        cont_grad_l_decay = config.get(cfg.CONT_GRAD_L_DECAY)
+        substrate = ContinuousGradientSubstrate(rows, cols, offset, cont_grad_r_factor=cont_grad_r_factor,
+                                                cont_grad_l_factor=cont_grad_l_factor,
+                                                cont_grad_r_shift=cont_grad_r_shift,
+                                                cont_grad_l_shift=cont_grad_l_shift,
+                                                cont_grad_r_decay=cont_grad_r_decay,
+                                                cont_grad_l_decay=cont_grad_l_decay)
 
     elif substrate_type == cfg.WEDGES:
         wedge_narrow_edge = config.get(cfg.WEDGE_NARROW_EDGE)
@@ -135,19 +137,22 @@ def initialize_growth_cones(config):
     gc_count = config.get(cfg.GC_COUNT)
     size = config.get(cfg.GC_SIZE)
     rows = config.get(cfg.ROWS)
-    gc_r_steepness = config.get(cfg.GC_R_STEEPNESS)
-    gc_l_steepness = config.get(cfg.GC_L_STEEPNESS)
-    gc_r_min = config.get(cfg.GC_R_MIN)
-    gc_l_min = config.get(cfg.GC_L_MIN)
-    gc_r_max = config.get(cfg.GC_R_MAX)
-    gc_l_max = config.get(cfg.GC_L_MAX)
     rho = config.get(cfg.RHO)
+    cols = config.get(cfg.COLS)
+    gc_r_factor = config.get(cfg.GC_R_FACTOR)
+    gc_l_factor = config.get(cfg.GC_L_FACTOR)
+    gc_r_shift = config.get(cfg.GC_R_SHIFT)
+    gc_l_shift = config.get(cfg.GC_L_SHIFT)
+    gc_r_decay = config.get(cfg.GC_R_DECAY)
+    gc_l_decay = config.get(cfg.GC_L_DECAY)
 
-    receptor_gradient = np.linspace(0, 1, gc_count) ** gc_r_steepness
-    receptors = gc_r_min + receptor_gradient * (gc_r_max - gc_r_min)
-
-    ligand_gradient = np.linspace(1, 0, gc_count) ** gc_l_steepness
-    ligands = gc_l_min + ligand_gradient * (gc_l_max - gc_l_min)
+    x_positions = np.linspace(1, cols, gc_count)
+    center = (cols + 1) / 2
+    receptors = []
+    ligands = []
+    for position in x_positions:
+        receptors.append(gc_r_factor * np.exp(gc_r_decay * (position + gc_r_shift - center)))
+        ligands.append(gc_l_factor * np.exp(-gc_l_decay * (position + gc_l_shift - center)))
 
     # Create an array of evenly distributed y-positions for the growth cones
     y_positions = np.linspace(size, rows - 1 + size, gc_count, dtype=int)

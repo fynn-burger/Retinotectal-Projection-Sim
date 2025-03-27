@@ -85,76 +85,27 @@ class ContinuousGradientSubstrate(BaseSubstrate):
     def __init__(self, rows, cols, offset, **kwargs):
         # Initialize the superclass with all given keyword arguments
         super().__init__(rows, cols, offset, **kwargs)
-        self.cont_grad_l_min = kwargs.get('cont_grad_l_min')
-        self.cont_grad_l_max = kwargs.get('cont_grad_l_max')
-        self.cont_grad_r_min = kwargs.get('cont_grad_r_min')
-        self.cont_grad_r_max = kwargs.get('cont_grad_r_max')
-        self.cont_grad_r_steepness = kwargs.get('cont_grad_r_steepness')
-        self.cont_grad_l_steepness = kwargs.get('cont_grad_l_steepness')
+        self.cont_grad_r_factor = kwargs.get('cont_grad_r_factor')
+        self.cont_grad_l_factor = kwargs.get('cont_grad_l_factor')
+        self.cont_grad_r_shift = kwargs.get('cont_grad_r_shift')
+        self.cont_grad_l_shift = kwargs.get('cont_grad_l_shift')
+        self.cont_grad_r_decay = kwargs.get('cont_grad_r_decay')
+        self.cont_grad_l_decay = kwargs.get('cont_grad_l_decay')
 
     def initialize_substrate(self):
         """
         Initialize the substrate using continuous gradients of ligand and receptor values.
         """
+        receptor_gradient = []
+        ligand_gradient = []
+        center = (self.cols - 2*self.offset + 1) / 2
 
-        # Create gradient
-        ligand_gradient = np.linspace(0, 1, self.cols - (2 * self.offset)) ** self.cont_grad_l_steepness
-        receptor_gradient = np.linspace(1, 0, self.cols - (2 * self.offset)) ** self.cont_grad_r_steepness
-
-        # Step 2: Scale base values to users range
-        receptor_gradient = self.cont_grad_r_min + (self.cont_grad_r_max - self.cont_grad_r_min) * receptor_gradient
-        ligand_gradient = self.cont_grad_l_min + (self.cont_grad_l_max - self.cont_grad_l_min) * ligand_gradient
-
-        #'''
-        low_l_percent = ligand_gradient[0]/ligand_gradient[1]
-        low_l_factor = low_l_percent ** (1+self.cont_grad_l_steepness/10)
-        low_end_ligand = [ligand_gradient[0]]
-        for i in range(self.offset):
-            ligand_value = low_end_ligand[i] * low_l_factor
-            low_end_ligand.append(ligand_value)
-        low_end_ligand = low_end_ligand[::-1]
-        low_end_ligand = low_end_ligand[:-1]
-
-        high_l_percent = ligand_gradient[-1]/ligand_gradient[-2]
-        high_l_factor = high_l_percent ** (1+self.cont_grad_l_steepness/10)
-
-        high_end_ligand = [ligand_gradient[-1]]
-        for i in range(self.offset):
-            ligand_value = high_end_ligand[i] * high_l_factor
-            high_end_ligand.append(ligand_value)
-        high_end_ligand = high_end_ligand[1:]
-
-        low_r_percent = receptor_gradient[-1]/receptor_gradient[-2]
-        low_r_factor = low_r_percent ** (1+self.cont_grad_r_steepness/10)
-        low_end_receptor = [receptor_gradient[-1]]
-        for i in range(self.offset):
-            receptor_value = low_end_receptor[i] * low_r_factor
-            low_end_receptor.append(receptor_value)
-        low_end_receptor = low_end_receptor[1:]
-
-        high_r_percent = receptor_gradient[0]/receptor_gradient[1]
-        high_r_factor = high_r_percent ** (1+self.cont_grad_r_steepness/10)
-
-
-        high_end_receptor = [receptor_gradient[0]]
-        for i in range(self.offset):
-            receptor_value = high_end_receptor[i] * high_r_factor
-            high_end_receptor.append(receptor_value)
-        high_end_receptor = high_end_receptor[1:]
-        high_end_receptor = high_end_receptor[::-1]
-        #'''
-
-        # Append offset on both ends
-        """
-        low_end_ligand = np.full(self.offset, self.cont_grad_l_min)
-        high_end_ligand = np.full(self.offset, self.cont_grad_l_max)
-        low_end_receptor = np.full(self.offset, self.cont_grad_r_min)
-        high_end_receptor = np.full(self.offset, self.cont_grad_r_max)
-        """
-
-        # concatenate offsets and gradient
-        ligand_gradient = np.concatenate([low_end_ligand, ligand_gradient, high_end_ligand])
-        receptor_gradient = np.concatenate([high_end_receptor, receptor_gradient, low_end_receptor])
+        x_positions = np.linspace(1 - self.offset, self.cols - self.offset, self.cols)
+        for position in x_positions:
+            receptor_gradient.append(self.cont_grad_r_factor * np.exp(-self.cont_grad_r_decay *
+                                                                      (position + self.cont_grad_r_shift - center)))
+            ligand_gradient.append(self.cont_grad_l_factor * np.exp(self.cont_grad_l_decay *
+                                                                    (position + self.cont_grad_l_shift - center)))
 
         for row in range(self.rows):
             self.ligands[row, :] = ligand_gradient

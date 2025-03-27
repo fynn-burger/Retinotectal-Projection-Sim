@@ -113,11 +113,13 @@ class Simulation:
                     pos_new = self.gen_random_step(gc)
 
                     # do NOT recalculate the current potential for reduced time-complexity -> Try calculating it again
-                    # I would do this
+                    # I would do this but only when there are problems with stuck gcs
+
                     gc.potential = calculate_potential(gc, gc.pos, self.growth_cones, self.substrate,
                                                        self.forward_sig, self.reverse_sig, self.ff_inter,
                                                        self.ft_inter, self.cis_inter, step_current, self.num_steps,
                                                        self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
+
 
                     potential_new = calculate_potential(gc, pos_new, self.growth_cones, self.substrate,
                                                         self.forward_sig, self.reverse_sig, self.ff_inter,

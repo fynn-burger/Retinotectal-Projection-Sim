@@ -30,12 +30,12 @@ CIS_INTER = "cis_inter"
 INTERIM_RESULTS = "interim_results"
 
 # Growth Cones
-GC_R_STEEPNESS = "receptor_steepness"
-GC_L_STEEPNESS = "ligand_steepness"
-GC_R_MIN = "receptor_min"
-GC_L_MIN = "ligand_min"
-GC_R_MAX = "receptor_max"
-GC_L_MAX = "ligand_max"
+GC_R_DECAY = "receptor_decay"
+GC_L_DECAY = "ligand_decay"
+GC_R_FACTOR = "gc_r_factor"
+GC_L_FACTOR = "gc_l_factor"
+GC_R_SHIFT = "gc_r_sift"
+GC_L_SHIFT = "gc_l_sift"
 RHO = "rho"
 GC_SCOPE = "gc_scope"
 
@@ -58,12 +58,12 @@ SUBSTRATE_TYPE = "substrate_type"
 ROWS = "rows"
 COLS = "cols"
 # -----------   Continuous  -----------
-CONT_GRAD_R_STEEPNESS = "continuous_receptor_steepness"
-CONT_GRAD_L_STEEPNESS = "continuous_ligand_steepness"
-CONT_GRAD_R_MIN = "continuous_receptor_start"
-CONT_GRAD_L_MIN = "continuous_ligand_start"
-CONT_GRAD_R_MAX = "continuous_receptor_end"
-CONT_GRAD_L_MAX = "continuous_ligand_end"
+CONT_GRAD_R_DECAY = "continuous_receptor_decay"
+CONT_GRAD_L_DECAY = "continuous_ligand_decay"
+CONT_GRAD_R_FACTOR = "cont_grad_r_factor"
+CONT_GRAD_L_FACTOR = "cont_grad_l_factor"
+CONT_GRAD_R_SHIFT = "cont_grad_r_shift"
+CONT_GRAD_L_SHIFT = "cont_grad_l_shift"
 SUBSTRATE_SCOPE = "substrate_scope"
 # -----------   Wedges  -----------
 WEDGE_NARROW_EDGE = "wedge_narrow_edge"
@@ -125,12 +125,12 @@ continuous_substrate = {
     SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
     ROWS: 100,
     COLS: 100,
-    CONT_GRAD_R_MIN: 0.01,
-    CONT_GRAD_L_MIN: 0.01,
-    CONT_GRAD_R_MAX: 1,
-    CONT_GRAD_L_MAX: 1,
-    CONT_GRAD_R_STEEPNESS: 1,
-    CONT_GRAD_L_STEEPNESS: 1,
+    CONT_GRAD_R_FACTOR: 1,
+    CONT_GRAD_L_FACTOR: 1,
+    CONT_GRAD_R_SHIFT: 0,
+    CONT_GRAD_L_SHIFT: 0,
+    CONT_GRAD_R_DECAY: 0.05,
+    CONT_GRAD_L_DECAY: 0.05,
     SUBSTRATE_SCOPE: "full",
 
 }
@@ -188,12 +188,12 @@ default_configs = {
         GC_SIZE: 3,
         STEP_SIZE: 1,
         STEP_NUM: 5000,  # 8000
-        GC_R_STEEPNESS: 1.5,
-        GC_L_STEEPNESS: 1.5,
-        GC_R_MIN: 0.01,
-        GC_L_MIN: 0.01,
-        GC_R_MAX: 2.99,
-        GC_L_MAX: 2.99,
+        GC_R_DECAY: 1.5,
+        GC_L_DECAY: 1.5,
+        GC_R_FACTOR: 1,
+        GC_L_FACTOR: 1,
+        GC_R_SHIFT: 0,
+        GC_L_SHIFT: 0,
         RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
@@ -215,24 +215,24 @@ default_configs = {
         SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
         ROWS: 100,
         COLS: 100,
-        CONT_GRAD_R_MIN: 0.01,
-        CONT_GRAD_L_MIN: 0.01,
-        CONT_GRAD_R_MAX: 0.99,
-        CONT_GRAD_L_MAX: 0.99,
-        CONT_GRAD_R_STEEPNESS: 1.4,
-        CONT_GRAD_L_STEEPNESS: 1.4
+        CONT_GRAD_R_FACTOR: 1,
+        CONT_GRAD_L_FACTOR: 1,
+        CONT_GRAD_R_SHIFT: 0,
+        CONT_GRAD_L_SHIFT: 0,
+        CONT_GRAD_R_DECAY: 1.4,
+        CONT_GRAD_L_DECAY: 1.4
     },
     "WEDGES": {
         GC_COUNT: 10,
         GC_SIZE: 10,
         STEP_SIZE: 1,
         STEP_NUM: 8000,
-        GC_R_STEEPNESS: 1.5,
-        GC_L_STEEPNESS: 1.5,
-        GC_R_MIN: 0.01,
-        GC_L_MIN: 0.01,
-        GC_R_MAX: 2.99,
-        GC_L_MAX: 2.99,
+        GC_R_DECAY: 1.5,
+        GC_L_DECAY: 1.5,
+        GC_R_FACTOR: 1,
+        GC_L_FACTOR: 1,
+        GC_R_SHIFT: 0,
+        GC_L_SHIFT: 0,
         RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
@@ -259,12 +259,12 @@ default_configs = {
         GC_SIZE: 10,
         STEP_SIZE: 1,
         STEP_NUM: 8000,
-        GC_R_STEEPNESS: 1.5,
-        GC_L_STEEPNESS: 1.5,
-        GC_R_MIN: 0.01,
-        GC_L_MIN: 0.01,
-        GC_R_MAX: 2.99,
-        GC_L_MAX: 2.99,
+        GC_R_DECAY: 1.5,
+        GC_L_DECAY: 1.5,
+        GC_R_FACTOR: 1,
+        GC_L_FACTOR: 1,
+        GC_R_SHIFT: 0,
+        GC_L_SHIFT: 0,
         RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
@@ -294,12 +294,12 @@ default_configs = {
         GC_SIZE: 5,
         STEP_SIZE: 2,
         STEP_NUM: 8000,
-        GC_R_STEEPNESS: 1.5,
-        GC_L_STEEPNESS: 1.5,
-        GC_R_MIN: 0.01,
-        GC_L_MIN: 0.01,
-        GC_R_MAX: 2.99,
-        GC_L_MAX: 2.99,
+        GC_R_DECAY: 1.5,
+        GC_L_DECAY: 1.5,
+        GC_R_FACTOR: 1,
+        GC_L_FACTOR: 1,
+        GC_R_SHIFT: 0,
+        GC_L_SHIFT: 0,
         RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
@@ -343,14 +343,14 @@ def get_default_config(substrate_type):
 
 custom_config = {
     # GC Parameters
-    GC_COUNT: 100,
+    GC_COUNT: 50,
     GC_SIZE: 3,
-    GC_R_STEEPNESS: 3,
-    GC_L_STEEPNESS: 3,
-    GC_R_MIN: 0.01,
-    GC_L_MIN: 0.01, # 0.385 bei steepness 1,4
-    GC_R_MAX: 1,
-    GC_L_MAX: 1,
+    GC_R_DECAY: 0.05,
+    GC_L_DECAY: 0.05,
+    GC_R_FACTOR: 1,
+    GC_L_FACTOR: 1,
+    GC_R_SHIFT: 0,
+    GC_L_SHIFT: 0,
     RHO: 0.7,  #0.7
 
     # Interaction Toggles
@@ -388,12 +388,12 @@ custom_config = {
     COLS: 50,
 
     # Continuous substrate values
-    CONT_GRAD_R_STEEPNESS: 3,
-    CONT_GRAD_L_STEEPNESS: 3,
-    CONT_GRAD_R_MIN: 0.05, #1.94 für steepness 4 10,4 bei steepness 1,4
-    CONT_GRAD_L_MIN: 0.05, # Probiere noch unterschiedliche Steepnesses
-    CONT_GRAD_R_MAX: 5,
-    CONT_GRAD_L_MAX: 5,
+    CONT_GRAD_R_DECAY: 0.05,
+    CONT_GRAD_L_DECAY: 0.05,
+    CONT_GRAD_R_FACTOR: 1,
+    CONT_GRAD_L_FACTOR: 1,
+    CONT_GRAD_R_SHIFT: 0,
+    CONT_GRAD_L_SHIFT: 0,
     SUBSTRATE_SCOPE: "full",
 
     # Stripe substrate values

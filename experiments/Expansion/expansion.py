@@ -1,24 +1,23 @@
-from build.config import SUBSTRATE_TYPE, CONTINUOUS_GRADIENTS, GC_L_STEEPNESS, GC_R_STEEPNESS, ROWS, COLS, GC_COUNT, \
-    GC_SIZE, STEP_SIZE, GC_R_MIN, GC_R_MAX, GC_L_MAX, GC_L_MIN, RHO, \
+from build.config import SUBSTRATE_TYPE, CONTINUOUS_GRADIENTS, GC_L_DECAY, GC_R_DECAY, ROWS, COLS, GC_COUNT, \
+    GC_SIZE, STEP_SIZE, GC_R_FACTOR, GC_R_SHIFT, GC_L_FACTOR, GC_L_SHIFT, RHO, \
     STEP_NUM, X_STEP_POSSIBILITY, Y_STEP_POSSIBILITY, SIGMA, FORCE, ADAPTATION_ENABLED, ADAPTATION_MU, SIGMOID_SHIFT, \
     ADAPTATION_LAMBDA, ADAPTATION_HISTORY, SIGMOID_STEEPNESS, FORWARD_SIG, REVERSE_SIG, FF_INTER, FT_INTER,  \
-    CIS_INTER, SIGMOID_HEIGHT, INTERIM_RESULTS, CONT_GRAD_L_STEEPNESS, CONT_GRAD_R_STEEPNESS, CONT_GRAD_L_MAX, \
-    CONT_GRAD_R_MAX, CONT_GRAD_R_MIN, CONT_GRAD_L_MIN, GC_SCOPE, SUBSTRATE_SCOPE
+    CIS_INTER, SIGMOID_HEIGHT, INTERIM_RESULTS, CONT_GRAD_L_DECAY, CONT_GRAD_R_DECAY, CONT_GRAD_L_FACTOR, \
+    CONT_GRAD_R_FACTOR, CONT_GRAD_R_SHIFT, CONT_GRAD_L_SHIFT, GC_SCOPE, SUBSTRATE_SCOPE
 from build import object_factory
 import visualization as vz
-import sys
 import numpy as np
 
 expansion_config = {
     # GC Parameters
     GC_COUNT: 200,  # use double the gcs you want
     GC_SIZE: 2,
-    GC_R_STEEPNESS: 1.6,
-    GC_L_STEEPNESS: 1.6,
-    GC_R_MIN: 0.01,
-    GC_L_MIN: 0.01,
-    GC_R_MAX: 1,
-    GC_L_MAX: 1,
+    GC_R_DECAY: 0.15,
+    GC_L_DECAY: 0.15,
+    GC_R_FACTOR: 1,
+    GC_L_FACTOR: 1,
+    GC_R_SHIFT: 50,
+    GC_L_SHIFT: -50,
     RHO: 0.7,
     GC_SCOPE: "full",
 
@@ -32,7 +31,7 @@ expansion_config = {
     # Interaction Parameters
     SIGMOID_STEEPNESS: 4,
     SIGMOID_SHIFT: 1.75,
-    SIGMOID_HEIGHT: 100,
+    SIGMOID_HEIGHT: 20000,
 
     # Adaptation
     ADAPTATION_ENABLED: True,
@@ -42,13 +41,13 @@ expansion_config = {
 
     # Step Parameters
     STEP_SIZE: 1,
-    STEP_NUM: 10000,
+    STEP_NUM: 5000,
     X_STEP_POSSIBILITY: 0.50,
     Y_STEP_POSSIBILITY: 0.50,
     SIGMA: 0.12,
     FORCE: False,
 
-    INTERIM_RESULTS: [2000, 4000, 6000, 8000],
+    INTERIM_RESULTS: [1000, 2000, 3000, 4000],
 
     # Substrate Basics
     SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
@@ -56,12 +55,12 @@ expansion_config = {
     COLS: 50,
 
     # Continuous substrate values
-    CONT_GRAD_R_STEEPNESS: 1.6,
-    CONT_GRAD_L_STEEPNESS: 1.6,
-    CONT_GRAD_R_MIN: 0.01,
-    CONT_GRAD_L_MIN: 0.01,
-    CONT_GRAD_R_MAX: 1,
-    CONT_GRAD_L_MAX: 1,
+    CONT_GRAD_R_DECAY: 0.15,
+    CONT_GRAD_L_DECAY: 0.15,
+    CONT_GRAD_R_FACTOR: 2,
+    CONT_GRAD_L_FACTOR: 2,
+    CONT_GRAD_R_SHIFT: -50,
+    CONT_GRAD_L_SHIFT: 50,
     SUBSTRATE_SCOPE: "anterior"
 
 }
@@ -93,7 +92,6 @@ def create_substrate(type, simulation):
         return simulation
     cols = (int((simulation.substrate.cols - simulation.substrate.offset*2)/2)
                                  + 2*simulation.substrate.offset)
-    print(cols)
     simulation.substrate.cols = cols
     if type == "anterior":
         ligand_gradient = simulation.substrate.ligands[0][:cols]
@@ -101,7 +99,6 @@ def create_substrate(type, simulation):
     elif type == "posterior":
         ligand_gradient = simulation.substrate.ligands[0][(cols - simulation.substrate.offset*2):]
         receptor_gradient = simulation.substrate.receptors[0][(cols - simulation.substrate.offset*2):]
-        print(ligand_gradient, receptor_gradient)
     else:
         raise Exception("Unknown substrate type")
 

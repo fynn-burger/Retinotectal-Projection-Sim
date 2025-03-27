@@ -1,3 +1,5 @@
+import sys
+
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import numpy as np
@@ -111,7 +113,7 @@ def visualize_projection(result, substrate, fit_type="linear", gc_scope="full", 
     # get values
     ap_values, nt_values = result.get_projection_id()
     # normalize values
-    ap_values_normalized = normalize_mapping(ap_values, substrate.offset, substrate.cols - substrate.offset)
+    ap_values_normalized = normalize_mapping(ap_values, substrate.offset, substrate.cols - substrate.offset - 1)
     nt_values_normalized = normalize_mapping(nt_values, nt_values[0], nt_values[-1])
 
     # create figure
