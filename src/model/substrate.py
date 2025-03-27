@@ -85,43 +85,27 @@ class ContinuousGradientSubstrate(BaseSubstrate):
     def __init__(self, rows, cols, offset, **kwargs):
         # Initialize the superclass with all given keyword arguments
         super().__init__(rows, cols, offset, **kwargs)
-        self.ligand_signal_start = kwargs.get('cont_grad_l_min')
-        self.ligand_signal_end = kwargs.get('cont_grad_l_max')
-        self.receptor_signal_start = kwargs.get('cont_grad_r_min')
-        self.receptor_signal_end = kwargs.get('cont_grad_r_max')
-        self.cont_grad_r_steepness = kwargs.get('cont_grad_r_steepness')
-        self.cont_grad_l_steepness = kwargs.get('cont_grad_l_steepness')
+        self.cont_grad_r_factor = kwargs.get('cont_grad_r_factor')
+        self.cont_grad_l_factor = kwargs.get('cont_grad_l_factor')
+        self.cont_grad_r_shift = kwargs.get('cont_grad_r_shift')
+        self.cont_grad_l_shift = kwargs.get('cont_grad_l_shift')
+        self.cont_grad_r_decay = kwargs.get('cont_grad_r_decay')
+        self.cont_grad_l_decay = kwargs.get('cont_grad_l_decay')
 
     def initialize_substrate(self):
         """
         Initialize the substrate using continuous gradients of ligand and receptor values.
         """
-        # New calculation with exponentiality
-        ligand_gradient = np.linspace(self.ligand_signal_start, self.ligand_signal_end,
-                                      self.cols - (2 * self.offset)) ** self.cont_grad_l_steepness
-        receptor_gradient = np.linspace(self.receptor_signal_end, self.receptor_signal_start,
-                                        self.cols - (2 * self.offset)) ** self.cont_grad_r_steepness
+        receptor_gradient = []
+        ligand_gradient = []
+        center = (self.cols - 2*self.offset + 1) / 2
 
-        # Scale the resulting gradients to the desired range
-        # Step 1: Normalize values to range [0, 1]
-        receptor_gradient = ((receptor_gradient - self.receptor_signal_end ** self.cont_grad_r_steepness)
-                             / (self.receptor_signal_start ** self.cont_grad_r_steepness - self.receptor_signal_end ** self.cont_grad_r_steepness))
-        ligand_gradient = ((ligand_gradient - self.ligand_signal_start ** self.cont_grad_l_steepness)
-                             / (self.ligand_signal_end ** self.cont_grad_l_steepness - self.ligand_signal_start ** self.cont_grad_l_steepness))
-
-        # Step 2: Scale normalized values to users range
-        receptor_gradient = self.receptor_signal_end + (self.receptor_signal_start - self.receptor_signal_end) * receptor_gradient
-        ligand_gradient = self.ligand_signal_start + (self.ligand_signal_end - self.ligand_signal_start) * ligand_gradient
-
-        # Append offset on both ends
-        low_end_ligand = np.full(self.offset, self.ligand_signal_start)
-        high_end_ligand = np.full(self.offset, self.ligand_signal_end)
-        low_end_receptor = np.full(self.offset, self.receptor_signal_start)
-        high_end_receptor = np.full(self.offset, self.receptor_signal_end)
-
-        # concatenate offsets and gradient
-        ligand_gradient = np.concatenate([low_end_ligand, ligand_gradient, high_end_ligand])
-        receptor_gradient = np.concatenate([high_end_receptor, receptor_gradient, low_end_receptor])
+        x_positions = np.linspace(1 - self.offset, self.cols - self.offset, self.cols)
+        for position in x_positions:
+            receptor_gradient.append(self.cont_grad_r_factor * np.exp(-self.cont_grad_r_decay *
+                                                                      (position + self.cont_grad_r_shift - center)))
+            ligand_gradient.append(self.cont_grad_l_factor * np.exp(self.cont_grad_l_decay *
+                                                                    (position + self.cont_grad_l_shift - center)))
 
         for row in range(self.rows):
             self.ligands[row, :] = ligand_gradient

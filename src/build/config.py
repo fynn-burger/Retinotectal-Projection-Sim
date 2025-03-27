@@ -27,14 +27,17 @@ REVERSE_SIG = "reverse_sig"
 FF_INTER = "ff_inter"
 FT_INTER = "ft_inter"
 CIS_INTER = "cis_inter"
+INTERIM_RESULTS = "interim_results"
 
 # Growth Cones
-GC_R_STEEPNESS = "receptor_steepness"
-GC_L_STEEPNESS = "ligand_steepness"
-GC_R_MIN = "receptor_min"
-GC_L_MIN = "ligand_min"
-GC_R_MAX = "receptor_max"
-GC_L_MAX = "ligand_max"
+GC_R_DECAY = "receptor_decay"
+GC_L_DECAY = "ligand_decay"
+GC_R_FACTOR = "gc_r_factor"
+GC_L_FACTOR = "gc_l_factor"
+GC_R_SHIFT = "gc_r_sift"
+GC_L_SHIFT = "gc_l_sift"
+RHO = "rho"
+GC_SCOPE = "gc_scope"
 
 # Adaptation
 ADAPTATION_ENABLED = "adaptation_enabled"
@@ -55,12 +58,13 @@ SUBSTRATE_TYPE = "substrate_type"
 ROWS = "rows"
 COLS = "cols"
 # -----------   Continuous  -----------
-CONT_GRAD_R_STEEPNESS = "continuous_receptor_steepness"
-CONT_GRAD_L_STEEPNESS = "continuous_ligand_steepness"
-CONT_GRAD_R_MIN = "continuous_receptor_start"
-CONT_GRAD_L_MIN = "continuous_ligand_start"
-CONT_GRAD_R_MAX = "continuous_receptor_end"
-CONT_GRAD_L_MAX = "continuous_ligand_end"
+CONT_GRAD_R_DECAY = "continuous_receptor_decay"
+CONT_GRAD_L_DECAY = "continuous_ligand_decay"
+CONT_GRAD_R_FACTOR = "cont_grad_r_factor"
+CONT_GRAD_L_FACTOR = "cont_grad_l_factor"
+CONT_GRAD_R_SHIFT = "cont_grad_r_shift"
+CONT_GRAD_L_SHIFT = "cont_grad_l_shift"
+SUBSTRATE_SCOPE = "substrate_scope"
 # -----------   Wedges  -----------
 WEDGE_NARROW_EDGE = "wedge_narrow_edge"
 WEDGE_WIDE_EDGE = "wedge_wide_edge"
@@ -104,7 +108,8 @@ simulation_advanced = {
     FORWARD_SIG: True,
     REVERSE_SIG: True,
     FF_INTER: True,
-    FT_INTER: True
+    FT_INTER: True,
+    INTERIM_RESULTS: []
 }
 
 adaptation = {
@@ -120,12 +125,13 @@ continuous_substrate = {
     SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
     ROWS: 100,
     COLS: 100,
-    CONT_GRAD_R_MIN: 0.01,
-    CONT_GRAD_L_MIN: 0.01,
-    CONT_GRAD_R_MAX: 1,
-    CONT_GRAD_L_MAX: 1,
-    CONT_GRAD_R_STEEPNESS: 1,
-    CONT_GRAD_L_STEEPNESS: 1,
+    CONT_GRAD_R_FACTOR: 1,
+    CONT_GRAD_L_FACTOR: 1,
+    CONT_GRAD_R_SHIFT: 0,
+    CONT_GRAD_L_SHIFT: 0,
+    CONT_GRAD_R_DECAY: 0.05,
+    CONT_GRAD_L_DECAY: 0.05,
+    SUBSTRATE_SCOPE: "full",
 
 }
 
@@ -182,12 +188,13 @@ default_configs = {
         GC_SIZE: 3,
         STEP_SIZE: 1,
         STEP_NUM: 5000,  # 8000
-        GC_R_STEEPNESS: 1.5,
-        GC_L_STEEPNESS: 1.5,
-        GC_R_MIN: 0.01,
-        GC_L_MIN: 0.01,
-        GC_R_MAX: 2.99,
-        GC_L_MAX: 2.99,
+        GC_R_DECAY: 1.5,
+        GC_L_DECAY: 1.5,
+        GC_R_FACTOR: 1,
+        GC_L_FACTOR: 1,
+        GC_R_SHIFT: 0,
+        GC_L_SHIFT: 0,
+        RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
         SIGMOID_STEEPNESS: 4,
@@ -204,27 +211,29 @@ default_configs = {
         ADAPTATION_MU: 0.01,
         ADAPTATION_LAMBDA: 0.0045,
         ADAPTATION_HISTORY: 50,
+        INTERIM_RESULTS: [],
         SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
         ROWS: 100,
         COLS: 100,
-        CONT_GRAD_R_MIN: 0.01,
-        CONT_GRAD_L_MIN: 0.01,
-        CONT_GRAD_R_MAX: 0.99,
-        CONT_GRAD_L_MAX: 0.99,
-        CONT_GRAD_R_STEEPNESS: 1.4,
-        CONT_GRAD_L_STEEPNESS: 1.4
+        CONT_GRAD_R_FACTOR: 1,
+        CONT_GRAD_L_FACTOR: 1,
+        CONT_GRAD_R_SHIFT: 0,
+        CONT_GRAD_L_SHIFT: 0,
+        CONT_GRAD_R_DECAY: 1.4,
+        CONT_GRAD_L_DECAY: 1.4
     },
     "WEDGES": {
         GC_COUNT: 10,
         GC_SIZE: 10,
         STEP_SIZE: 1,
         STEP_NUM: 8000,
-        GC_R_STEEPNESS: 1.5,
-        GC_L_STEEPNESS: 1.5,
-        GC_R_MIN: 0.01,
-        GC_L_MIN: 0.01,
-        GC_R_MAX: 2.99,
-        GC_L_MAX: 2.99,
+        GC_R_DECAY: 1.5,
+        GC_L_DECAY: 1.5,
+        GC_R_FACTOR: 1,
+        GC_L_FACTOR: 1,
+        GC_R_SHIFT: 0,
+        GC_L_SHIFT: 0,
+        RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
         SIGMOID_STEEPNESS: 4,
@@ -238,6 +247,7 @@ default_configs = {
         FT_INTER: True,
         CIS_INTER: True,
         ADAPTATION_ENABLED: False,
+        INTERIM_RESULTS: [],
         SUBSTRATE_TYPE: WEDGES,
         ROWS: 96,
         COLS: 96,
@@ -249,12 +259,13 @@ default_configs = {
         GC_SIZE: 10,
         STEP_SIZE: 1,
         STEP_NUM: 8000,
-        GC_R_STEEPNESS: 1.5,
-        GC_L_STEEPNESS: 1.5,
-        GC_R_MIN: 0.01,
-        GC_L_MIN: 0.01,
-        GC_R_MAX: 2.99,
-        GC_L_MAX: 2.99,
+        GC_R_DECAY: 1.5,
+        GC_L_DECAY: 1.5,
+        GC_R_FACTOR: 1,
+        GC_L_FACTOR: 1,
+        GC_R_SHIFT: 0,
+        GC_L_SHIFT: 0,
+        RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
         SIGMOID_STEEPNESS: 4,
@@ -268,6 +279,7 @@ default_configs = {
         FT_INTER: True,
         CIS_INTER: True,
         ADAPTATION_ENABLED: False,
+        INTERIM_RESULTS: [],
         SUBSTRATE_TYPE: STRIPE,
         ROWS: 150,
         COLS: 150,
@@ -282,12 +294,13 @@ default_configs = {
         GC_SIZE: 5,
         STEP_SIZE: 2,
         STEP_NUM: 8000,
-        GC_R_STEEPNESS: 1.5,
-        GC_L_STEEPNESS: 1.5,
-        GC_R_MIN: 0.01,
-        GC_L_MIN: 0.01,
-        GC_R_MAX: 2.99,
-        GC_L_MAX: 2.99,
+        GC_R_DECAY: 1.5,
+        GC_L_DECAY: 1.5,
+        GC_R_FACTOR: 1,
+        GC_L_FACTOR: 1,
+        GC_R_SHIFT: 0,
+        GC_L_SHIFT: 0,
+        RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
         SIGMOID_STEEPNESS: 4,
@@ -304,6 +317,7 @@ default_configs = {
         ADAPTATION_MU: 0.01,
         ADAPTATION_LAMBDA: 0.0045,
         ADAPTATION_HISTORY: 50,
+        INTERIM_RESULTS: [],
         SUBSTRATE_TYPE: GAP,
         ROWS: 96,
         COLS: 96,
@@ -328,57 +342,73 @@ def get_default_config(substrate_type):
 """
 
 custom_config = {
+    # GC Parameters
     GC_COUNT: 50,
     GC_SIZE: 3,
-    STEP_SIZE: 1,
-    STEP_NUM: 8000,
-    X_STEP_POSSIBILITY: 0.55,
-    Y_STEP_POSSIBILITY: 0.50,
-    SIGMOID_STEEPNESS: 4,
-    SIGMOID_SHIFT: 3,
-    SIGMOID_HEIGHT: 1,
-    GC_R_STEEPNESS: 1.4,
-    GC_L_STEEPNESS: 1.4,
-    GC_R_MIN: 0.01,
-    GC_L_MIN: 0.01,
-    GC_R_MAX: 1,
-    GC_L_MAX: 1,
-    SIGMA: 0.12,
-    FORCE: False,
+    GC_R_DECAY: 0.05,
+    GC_L_DECAY: 0.05,
+    GC_R_FACTOR: 1,
+    GC_L_FACTOR: 1,
+    GC_R_SHIFT: 0,
+    GC_L_SHIFT: 0,
+    RHO: 0.7,  #0.7
+
+    # Interaction Toggles
     FORWARD_SIG: True,
     REVERSE_SIG: True,
-    FF_INTER: True,
+    FF_INTER: False,
     FT_INTER: True,
     CIS_INTER: True,
+
+    # Interaction Parameters
+    SIGMOID_STEEPNESS: 4,
+    SIGMOID_SHIFT: 1.75,
+    SIGMOID_HEIGHT: 10000,
+
+    # Adaptation
     ADAPTATION_ENABLED: True,
-    ADAPTATION_MU: 0.012,  # 0,006
-    ADAPTATION_LAMBDA: 0.0017,  # 0.0045
-    ADAPTATION_HISTORY: 50,
-    SUBSTRATE_TYPE: GAP_INV,
-    ROWS: 50,
-    COLS: 100,
+    ADAPTATION_MU: 0.096,
+    ADAPTATION_LAMBDA: 0.0008,
+    ADAPTATION_HISTORY: 10,
+
+    # Step Parameters
+    STEP_SIZE: 1,
+    STEP_NUM: 5000,
+    X_STEP_POSSIBILITY: 0.525,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
+    Y_STEP_POSSIBILITY: 0.50,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
+    SIGMA: 0.12,
+    FORCE: False,
+
+    # Mapping results nach ... Schritten -> Zeigt nicht an nach wie vielen es ist im moment
+    INTERIM_RESULTS: [1000, 2000, 3000, 4000, 5000],
+
+    # Substrate Basics
+    SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
+    ROWS: 8,
+    COLS: 50,
 
     # Continuous substrate values
-    CONT_GRAD_R_STEEPNESS: 1.4,
-    CONT_GRAD_L_STEEPNESS: 1.4,
-    CONT_GRAD_R_MIN: 0.27,  # it is possible to use 0 -> Does this make sense
-    CONT_GRAD_L_MIN: 0.27,  # it is possible to use 0 -> Does this make sense
-    CONT_GRAD_R_MAX: 27,
-    CONT_GRAD_L_MAX: 27,
+    CONT_GRAD_R_DECAY: 0.05,
+    CONT_GRAD_L_DECAY: 0.05,
+    CONT_GRAD_R_FACTOR: 1,
+    CONT_GRAD_L_FACTOR: 1,
+    CONT_GRAD_R_SHIFT: 0,
+    CONT_GRAD_L_SHIFT: 0,
+    SUBSTRATE_SCOPE: "full",
 
     # Stripe substrate values
     STRIPE_FWD: True,
     STRIPE_REW: True,
-    STRIPE_LIGAND_CONC: 0.5,
+    STRIPE_LIGAND_CONC: 1,
     STRIPE_RECEPTOR_CONC: 1,
     STRIPE_WIDTH: 6.625,
 
     # Gap substrate Values
     GAP_BEGIN: 0.06,
-    GAP_END: 0.05,
+    GAP_END: 0.06,
     GAP_FIRST_BLOCK: RECEPTOR,
     GAP_SECOND_BLOCK: RECEPTOR,
-    GAP_FIRST_BLOCK_CONC: 10,
+    GAP_FIRST_BLOCK_CONC: 27,
     GAP_SECOND_BLOCK_CONC: 1
 }
 

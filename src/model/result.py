@@ -31,22 +31,21 @@ class Result:
             "config": self.config,
         }
 
-    def get_mapping(self, attribute="id", halved=False):
+    def get_mapping(self, attribute="id"):
         """
         Generates a projection mapping representation based on a specified attribute.
         Supports 'id', 'start_pos', or 'final_pos' for y-axis mapping.
 
         :param attribute: Attribute for y-axis values ('id', 'start_pos', 'final_pos').
-        :param halved: Whether to halve the y-axis values.
         """
         x_values = np.array([gc.pos[0] for gc in self.simulation.growth_cones])
         if attribute == "id":
-            y_values = np.array([gc.id / 2 if halved else gc.id for gc in self.simulation.growth_cones])
+            y_values = np.array([gc.id for gc in self.simulation.growth_cones])
         elif attribute == "start_pos":
             y_values = np.array(
-                [gc.get_start_pos()[1] / 2 if halved else gc.get_start_pos()[1] for gc in self.simulation.growth_cones])
+                [gc.get_start_pos()[1] for gc in self.simulation.growth_cones])
         elif attribute == "final_pos":
-            y_values = np.array([gc.pos[1] / 2 if halved else gc.pos[1] for gc in self.simulation.growth_cones])
+            y_values = np.array([gc.pos[1] for gc in self.simulation.growth_cones])
         else:
             raise ValueError("Invalid attribute specified for mapping.")
 
