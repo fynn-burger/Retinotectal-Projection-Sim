@@ -147,8 +147,8 @@ def add_linear_regression(x, y):
                  label=f'Linear Regression\nSlope: {slope:.2f}\n'
                        f'R²: {correlation:.2f}\nNull Point X: {null_point_x:.2f}\nNull Point Y: {intercept:.2f}')
 
-    except ValueError:
-        print ("clould not calculate linear regression")
+    except (ValueError, TypeError) as e:
+        print ("could not calculate linear regression", e)
 
 
 def add_polynomial_fit(x, y, mutated_indexes):
