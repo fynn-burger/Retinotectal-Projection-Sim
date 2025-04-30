@@ -7,7 +7,7 @@ from matplotlib.figure import Figure
 from scipy.stats import linregress
 import base64
 import io
-
+from model.substrate import ContinuousGradientSubstrate
 
 def get_images_pre(simulation):
     return {
@@ -128,7 +128,7 @@ def visualize_projection(result, substrate, fit_type="linear", gc_scope="full", 
     except ValueError as e:
         print("could not calculate linear regression")
 
-    if gc_scope != "full" or substrate_scope != "full":
+    if gc_scope != "full" or substrate_scope != "full" and isinstance(substrate, ContinuousGradientSubstrate):
         create_halved_projection(gc_scope, substrate_scope)
 
     plt.legend()

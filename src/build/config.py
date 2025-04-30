@@ -57,6 +57,10 @@ GAP_INV = "gap_inv"
 SUBSTRATE_TYPE = "substrate_type"
 ROWS = "rows"
 COLS = "cols"
+
+# Additional Parameters -> not to be touched
+FOLDER_PATH = "folder_path"
+
 # -----------   Continuous  -----------
 CONT_GRAD_R_DECAY = "continuous_receptor_decay"
 CONT_GRAD_L_DECAY = "continuous_ligand_decay"
@@ -109,7 +113,8 @@ simulation_advanced = {
     REVERSE_SIG: True,
     FF_INTER: True,
     FT_INTER: True,
-    INTERIM_RESULTS: []
+    INTERIM_RESULTS: [],
+    FOLDER_PATH: ""
 }
 
 adaptation = {
@@ -195,6 +200,7 @@ default_configs = {
         GC_R_SHIFT: 0,
         GC_L_SHIFT: 0,
         RHO: 1,
+        GC_SCOPE: "full",
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
         SIGMOID_STEEPNESS: 4,
@@ -212,6 +218,7 @@ default_configs = {
         ADAPTATION_LAMBDA: 0.0045,
         ADAPTATION_HISTORY: 50,
         INTERIM_RESULTS: [],
+        FOLDER_PATH: "",
         SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
         ROWS: 100,
         COLS: 100,
@@ -248,6 +255,7 @@ default_configs = {
         CIS_INTER: True,
         ADAPTATION_ENABLED: False,
         INTERIM_RESULTS: [],
+        FOLDER_PATH: "",
         SUBSTRATE_TYPE: WEDGES,
         ROWS: 96,
         COLS: 96,
@@ -280,6 +288,7 @@ default_configs = {
         CIS_INTER: True,
         ADAPTATION_ENABLED: False,
         INTERIM_RESULTS: [],
+        FOLDER_PATH: "",
         SUBSTRATE_TYPE: STRIPE,
         ROWS: 150,
         COLS: 150,
@@ -318,6 +327,7 @@ default_configs = {
         ADAPTATION_LAMBDA: 0.0045,
         ADAPTATION_HISTORY: 50,
         INTERIM_RESULTS: [],
+        FOLDER_PATH: "",
         SUBSTRATE_TYPE: GAP,
         ROWS: 96,
         COLS: 96,
@@ -343,15 +353,16 @@ def get_default_config(substrate_type):
 
 custom_config = {
     # GC Parameters
-    GC_COUNT: 50,
-    GC_SIZE: 3,
-    GC_R_DECAY: 0.05,
-    GC_L_DECAY: 0.05,
+    GC_COUNT: 200,
+    GC_SIZE: 2,
+    GC_R_DECAY: 0.15,
+    GC_L_DECAY: 0.15,
     GC_R_FACTOR: 1,
     GC_L_FACTOR: 1,
     GC_R_SHIFT: 0,
     GC_L_SHIFT: 0,
     RHO: 0.7,  #0.7
+    GC_SCOPE: "full",
 
     # Interaction Toggles
     FORWARD_SIG: True,
@@ -367,20 +378,21 @@ custom_config = {
 
     # Adaptation
     ADAPTATION_ENABLED: True,
-    ADAPTATION_MU: 0.096,
-    ADAPTATION_LAMBDA: 0.0008,
+    ADAPTATION_MU: 0.1,
+    ADAPTATION_LAMBDA: 0.001,
     ADAPTATION_HISTORY: 10,
 
     # Step Parameters
     STEP_SIZE: 1,
     STEP_NUM: 5000,
-    X_STEP_POSSIBILITY: 0.525,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
+    X_STEP_POSSIBILITY: 0.55,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
     Y_STEP_POSSIBILITY: 0.50,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
-    SIGMA: 0.12,
+    SIGMA: 0.05,
     FORCE: False,
 
     # Mapping results nach ... Schritten -> Zeigt nicht an nach wie vielen es ist im moment
-    INTERIM_RESULTS: [1000, 2000, 3000, 4000, 5000],
+    INTERIM_RESULTS: [1000, 2000, 3000, 4000],
+    FOLDER_PATH: "",
 
     # Substrate Basics
     SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
@@ -388,13 +400,13 @@ custom_config = {
     COLS: 50,
 
     # Continuous substrate values
-    CONT_GRAD_R_DECAY: 0.05,
-    CONT_GRAD_L_DECAY: 0.05,
+    CONT_GRAD_R_DECAY: 0.15,
+    CONT_GRAD_L_DECAY: 0.15,
     CONT_GRAD_R_FACTOR: 1,
     CONT_GRAD_L_FACTOR: 1,
     CONT_GRAD_R_SHIFT: 0,
     CONT_GRAD_L_SHIFT: 0,
-    SUBSTRATE_SCOPE: "full",
+    SUBSTRATE_SCOPE: "anterior",
 
     # Stripe substrate values
     STRIPE_FWD: True,
@@ -404,12 +416,12 @@ custom_config = {
     STRIPE_WIDTH: 6.625,
 
     # Gap substrate Values
-    GAP_BEGIN: 0.06,
-    GAP_END: 0.06,
+    GAP_BEGIN: 0.6,
+    GAP_END: 0.05,
     GAP_FIRST_BLOCK: RECEPTOR,
     GAP_SECOND_BLOCK: RECEPTOR,
-    GAP_FIRST_BLOCK_CONC: 27,
-    GAP_SECOND_BLOCK_CONC: 1
+    GAP_FIRST_BLOCK_CONC: 1.5,
+    GAP_SECOND_BLOCK_CONC: 0
 }
 
 """

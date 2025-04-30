@@ -2,11 +2,14 @@
 Main module which executes simulation logic
 """
 import math
+import numpy as np
 import time
 from model.result import Result
 from model.potential_calculation import calculate_potential
 import visualization as vz
 import random
+from build import config as cfg
+import os
 
 progress = 0  # Global progress variable
 
@@ -126,18 +129,16 @@ class Simulation:
                                                         self.ft_inter, self.cis_inter, step_current, self.num_steps,
                                                         self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
                     self.step_decision(gc, pos_new, potential_new)
-                    if gc.id == 30 and (step_current % 100) == 0:
-                        print(step_current)
-                        print(gc.__str__())
-                        print(potential_new)
-                        if gc.potential == 0:
-                            print("0")
 
             # show projection results based on array given in config
             if step_current in self.interim_results:
                 # runtime should not be relevant -> set to 0
-                vz.visualize_projection(Result(self, 0, self.config), self.substrate,
-                                        gc_scope=self.gc_scope, substrate_scope=self.substrate_scope).show()
+                interim_results = vz.visualize_projection(Result(self, 0, self.config), self.substrate,
+                                        gc_scope=self.gc_scope, substrate_scope=self.substrate_scope)
+
+                interim_results.savefig(os.path.join(cfg.current_config.get(cfg.FOLDER_PATH),
+                                                     f"interim_result_step{step_current}.png"))
+                interim_results.show()
 
         progress = 100
         # TODO: @Performance Early stopping mechanism based on total potential
@@ -184,7 +185,12 @@ class Simulation:
         xt_direction *= self.step_size
         yt_direction *= self.step_size
 
-        return clamp_to_boundaries(gc.pos, self.substrate, gc.radius, xt_direction, yt_direction)
+        new_x = gc.pos[0] + xt_direction
+        new_y = gc.pos[1] + yt_direction
+
+        if not clamp_to_boundaries(new_x, new_y, self.substrate, gc.radius):
+            return self.gen_random_step(gc)
+        return new_x, new_y
 
 
 """
@@ -192,33 +198,21 @@ Utility functions needed for step decision
 """
 
 
-def clamp_to_boundaries(position, substrate, size, xt_direction, yt_direction):
-    """
-    Ensures that the position of the growth cone remains within the boundaries defined by the substrate after moving.
+def clamp_to_boundaries(new_x, new_y, substrate, size):
 
-    Parameters:
-        position (tuple): Current x and y coordinates of the growth cone.
-        substrate (object): Substrate defining the boundaries and structure of the model area.
-        size (int): Radius of the growth cone to ensure it does not overlap the boundary.
-        xt_direction (int): Horizontal movement direction and magnitude.
-        yt_direction (int): Vertical movement direction and magnitude.
+    if new_x < size or new_x > substrate.cols - 1- size:
+        return False
 
-    Returns:
-        tuple: Clamped x and y coordinates of the growth cone.
-    """
-    new_x = position[0] + xt_direction
-    new_y = position[1] + yt_direction
+    if new_y < size or new_y > substrate.rows - 1 - size:
+        return False
 
-    # Adjust the new position to prevent the growth cone from crossing the substrate boundaries
-    new_x_clamped = max(size, min(new_x, substrate.cols - 1 - size))
-    new_y_clamped = max(size, min(new_y, substrate.rows - 1 - size))
-
-    return new_x_clamped, new_y_clamped
+    return True
 
 
 def probabilistic_density(potential, sigma):
     # let this function as it is for now, it is already pretty intuitive if you know sigma is the standard deviation
-    return math.exp(-potential ** 2 / (2 * sigma ** 2)) / (math.sqrt(2 * math.pi) * sigma)
+    #return math.exp(-potential ** 2 / (2 * sigma ** 2)) / (math.sqrt(2 * math.pi) * sigma)
+    return np.exp(- np.abs(potential) / sigma) / (2 * sigma)
 
 
 def calculate_step_probability(old_prob, new_prob):

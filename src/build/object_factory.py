@@ -163,4 +163,17 @@ def initialize_growth_cones(config):
         gc = GrowthCone((size, pos_y), size, ligands[i], receptors[i], i, rho)
         growth_cones.append(gc)
 
+    if cfg.current_config.get(cfg.GC_SCOPE) != "full":
+        gc_len = int(len(growth_cones))
+        half_len = int(gc_len / 2)
+        if cfg.current_config.get(cfg.GC_SCOPE) == "nasal":
+            good_gcs = growth_cones[0:half_len]
+        elif cfg.current_config.get(cfg.GC_SCOPE) == "temporal":
+            good_gcs = growth_cones[half_len:gc_len]
+        else:
+            raise Exception("Unknown half gradient type")
+
+
+        growth_cones = good_gcs  # only use "good gcs for simulation"
+
     return growth_cones
