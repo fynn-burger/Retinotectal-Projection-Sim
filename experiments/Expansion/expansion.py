@@ -12,31 +12,31 @@ expansion_config = {
     # GC Parameters
     GC_COUNT: 200,  # use double the gcs you want
     GC_SIZE: 2,
-    GC_R_DECAY: 0.15,
-    GC_L_DECAY: 0.15,
+    GC_R_DECAY: 0.1,
+    GC_L_DECAY: 0.1,
     GC_R_FACTOR: 1,
     GC_L_FACTOR: 1,
-    GC_R_SHIFT: 50,
-    GC_L_SHIFT: -50,
+    GC_R_SHIFT: 0,
+    GC_L_SHIFT: 0,
     RHO: 0.7,
     GC_SCOPE: "full",
 
     # Interaction Toggles
     FORWARD_SIG: True,
     REVERSE_SIG: True,
-    FF_INTER: True,
+    FF_INTER: False,
     FT_INTER: True,
     CIS_INTER: True,
 
     # Interaction Parameters
     SIGMOID_STEEPNESS: 4,
     SIGMOID_SHIFT: 1.75,
-    SIGMOID_HEIGHT: 20000,
+    SIGMOID_HEIGHT: 50,
 
     # Adaptation
-    ADAPTATION_ENABLED: True,
-    ADAPTATION_MU: 0.096,
-    ADAPTATION_LAMBDA: 0.0008,
+    ADAPTATION_ENABLED: False,
+    ADAPTATION_MU: 0.1,
+    ADAPTATION_LAMBDA: 0.001,
     ADAPTATION_HISTORY: 10,
 
     # Step Parameters
@@ -44,10 +44,10 @@ expansion_config = {
     STEP_NUM: 5000,
     X_STEP_POSSIBILITY: 0.50,
     Y_STEP_POSSIBILITY: 0.50,
-    SIGMA: 0.12,
+    SIGMA: 0.08,
     FORCE: False,
 
-    INTERIM_RESULTS: [1000, 2000, 3000, 4000],
+    INTERIM_RESULTS: [i for i in range(1000, 5000, 1000)],
 
     # Substrate Basics
     SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
@@ -55,13 +55,13 @@ expansion_config = {
     COLS: 50,
 
     # Continuous substrate values
-    CONT_GRAD_R_DECAY: 0.15,
-    CONT_GRAD_L_DECAY: 0.15,
+    CONT_GRAD_R_DECAY: 0.1,
+    CONT_GRAD_L_DECAY: 0.1,
     CONT_GRAD_R_FACTOR: 2,
     CONT_GRAD_L_FACTOR: 2,
-    CONT_GRAD_R_SHIFT: -50,
-    CONT_GRAD_L_SHIFT: 50,
-    SUBSTRATE_SCOPE: "anterior"
+    CONT_GRAD_R_SHIFT: 0,
+    CONT_GRAD_L_SHIFT: 0,
+    SUBSTRATE_SCOPE: "full"
 
 }
 
@@ -126,6 +126,10 @@ def expansion():
     vz.visualize_results_on_substrate(result, simulation.substrate).show()
     vz.visualize_trajectory_on_substrate(result, simulation.substrate, simulation.growth_cones).show()
     vz.visualize_trajectories(simulation.growth_cones).show()
+    vz.visualize_adaptation_metrics(simulation.growth_cones).show()
+    outer, inner = vz.visualize_receptor_adaptation(simulation.growth_cones)
+    outer.show()
+    inner.show()
 
 def run():
     expansion()
