@@ -3,9 +3,10 @@
 .idea/misc.xml
 .idea/other.xml
 .idea/workspace.xml
-/Results_Retinotectal_Simulations_Fynn/
-Retinotectal_Results/*
-!Retinotectal_Results/
-!Retinotectal_Results/.gitkeep
+
+Retinotectal_Simulation_Results/*
+!Retinotectal_Simulation_Results/
+!Retinotectal_Simulation_Results/.gitkeep
 
 /python_tests_fynn/
+/Retinotectal_Simulations_Powerpoints/
