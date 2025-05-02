@@ -1,12 +1,11 @@
 """
 Main module which executes simulation logic
 """
-import math
 import numpy as np
 import time
 from model.result import Result
 from model.potential_calculation import calculate_potential
-import visualization as vz
+from visualization import utils as vz
 import random
 from build import config as cfg
 import os
@@ -135,13 +134,8 @@ class Simulation:
             # show projection results based on array given in config
             if step_current in self.interim_results:
                 # runtime should not be relevant -> set to 0
-                interim_results = vz.visualize_projection(Result(self, 0, self.config), self.substrate,
-                                        gc_scope=self.gc_scope, substrate_scope=self.substrate_scope,
-                                                          growth_cones=self.growth_cones,)
-                print(os.path)
-                interim_results.savefig(os.path.join(cfg.current_config.get(cfg.FOLDER_PATH),
-                                                     f"interim_result_step{step_current}.png"))
-                interim_results.show()
+                vz.plot_projection(Result(self, 0, self.config), self.substrate, self.growth_cones,
+                                   show=cfg.current_config.get(cfg.SHOW_FIGURES), current_step=step_current)
 
         progress = 100
         # TODO: @Performance Early stopping mechanism based on total potential
