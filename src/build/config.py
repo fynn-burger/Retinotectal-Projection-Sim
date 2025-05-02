@@ -61,6 +61,7 @@ COLS = "cols"
 # Parameters for Saving
 FOLDER_PATH = "folder_path"
 FOLDER_NAME = "folder_name"
+SHOW_FIGURES = "show_figures"
 
 # -----------   Continuous  -----------
 CONT_GRAD_R_DECAY = "continuous_receptor_decay"
@@ -116,7 +117,8 @@ simulation_advanced = {
     FT_INTER: True,
     INTERIM_RESULTS: [],
     FOLDER_PATH: "",
-    FOLDER_NAME: ""
+    FOLDER_NAME: "",
+    SHOW_FIGURES: True,
 }
 
 adaptation = {
@@ -222,6 +224,7 @@ default_configs = {
         INTERIM_RESULTS: [],
         FOLDER_PATH: "",
         FOLDER_NAME: "",
+        SHOW_FIGURES: True,
         SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
         ROWS: 100,
         COLS: 100,
@@ -260,6 +263,7 @@ default_configs = {
         INTERIM_RESULTS: [],
         FOLDER_PATH: "",
         FOLDER_NAME: "",
+        SHOW_FIGURES: True,
         SUBSTRATE_TYPE: WEDGES,
         ROWS: 96,
         COLS: 96,
@@ -294,6 +298,7 @@ default_configs = {
         INTERIM_RESULTS: [],
         FOLDER_PATH: "",
         FOLDER_NAME: "",
+        SHOW_FIGURES: True,
         SUBSTRATE_TYPE: STRIPE,
         ROWS: 150,
         COLS: 150,
@@ -334,6 +339,7 @@ default_configs = {
         INTERIM_RESULTS: [],
         FOLDER_PATH: "",
         FOLDER_NAME: "",
+        SHOW_FIGURES: True,
         SUBSTRATE_TYPE: GAP,
         ROWS: 96,
         COLS: 96,
@@ -400,6 +406,7 @@ custom_config = {
     INTERIM_RESULTS: [1000, 2000, 3000, 4000],
     FOLDER_PATH: "",
     FOLDER_NAME: "",
+    SHOW_FIGURES: False,
 
     # Substrate Basics
     SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
