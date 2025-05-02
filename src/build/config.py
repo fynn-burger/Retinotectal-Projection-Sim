@@ -58,8 +58,9 @@ SUBSTRATE_TYPE = "substrate_type"
 ROWS = "rows"
 COLS = "cols"
 
-# Additional Parameters -> not to be touched
+# Parameters for Saving
 FOLDER_PATH = "folder_path"
+FOLDER_NAME = "folder_name"
 
 # -----------   Continuous  -----------
 CONT_GRAD_R_DECAY = "continuous_receptor_decay"
@@ -114,7 +115,8 @@ simulation_advanced = {
     FF_INTER: True,
     FT_INTER: True,
     INTERIM_RESULTS: [],
-    FOLDER_PATH: ""
+    FOLDER_PATH: "",
+    FOLDER_NAME: ""
 }
 
 adaptation = {
@@ -219,6 +221,7 @@ default_configs = {
         ADAPTATION_HISTORY: 50,
         INTERIM_RESULTS: [],
         FOLDER_PATH: "",
+        FOLDER_NAME: "",
         SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
         ROWS: 100,
         COLS: 100,
@@ -256,6 +259,7 @@ default_configs = {
         ADAPTATION_ENABLED: False,
         INTERIM_RESULTS: [],
         FOLDER_PATH: "",
+        FOLDER_NAME: "",
         SUBSTRATE_TYPE: WEDGES,
         ROWS: 96,
         COLS: 96,
@@ -289,6 +293,7 @@ default_configs = {
         ADAPTATION_ENABLED: False,
         INTERIM_RESULTS: [],
         FOLDER_PATH: "",
+        FOLDER_NAME: "",
         SUBSTRATE_TYPE: STRIPE,
         ROWS: 150,
         COLS: 150,
@@ -328,6 +333,7 @@ default_configs = {
         ADAPTATION_HISTORY: 50,
         INTERIM_RESULTS: [],
         FOLDER_PATH: "",
+        FOLDER_NAME: "",
         SUBSTRATE_TYPE: GAP,
         ROWS: 96,
         COLS: 96,
@@ -367,32 +373,33 @@ custom_config = {
     # Interaction Toggles
     FORWARD_SIG: True,
     REVERSE_SIG: True,
-    FF_INTER: False,
+    FF_INTER: True,
     FT_INTER: True,
     CIS_INTER: True,
 
     # Interaction Parameters
     SIGMOID_STEEPNESS: 4,
     SIGMOID_SHIFT: 1.75,
-    SIGMOID_HEIGHT: 10000,
+    SIGMOID_HEIGHT: 5000,
 
     # Adaptation
     ADAPTATION_ENABLED: True,
-    ADAPTATION_MU: 0.1,
-    ADAPTATION_LAMBDA: 0.001,
+    ADAPTATION_MU: 0.09,
+    ADAPTATION_LAMBDA: 0.002,
     ADAPTATION_HISTORY: 10,
 
     # Step Parameters
     STEP_SIZE: 1,
     STEP_NUM: 5000,
-    X_STEP_POSSIBILITY: 0.55,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
+    X_STEP_POSSIBILITY: 0.50,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
     Y_STEP_POSSIBILITY: 0.50,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
-    SIGMA: 0.05,
+    SIGMA: 0.08,
     FORCE: False,
 
     # Mapping results nach ... Schritten -> Zeigt nicht an nach wie vielen es ist im moment
-    INTERIM_RESULTS: [1000, 2000, 3000, 4000],
+    INTERIM_RESULTS: [],
     FOLDER_PATH: "",
+    FOLDER_NAME: "",
 
     # Substrate Basics
     SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
@@ -402,11 +409,11 @@ custom_config = {
     # Continuous substrate values
     CONT_GRAD_R_DECAY: 0.15,
     CONT_GRAD_L_DECAY: 0.15,
-    CONT_GRAD_R_FACTOR: 1,
-    CONT_GRAD_L_FACTOR: 1,
+    CONT_GRAD_R_FACTOR: 3,
+    CONT_GRAD_L_FACTOR: 3,
     CONT_GRAD_R_SHIFT: 0,
     CONT_GRAD_L_SHIFT: 0,
-    SUBSTRATE_SCOPE: "anterior",
+    SUBSTRATE_SCOPE: "full",
 
     # Stripe substrate values
     STRIPE_FWD: True,
@@ -421,7 +428,7 @@ custom_config = {
     GAP_FIRST_BLOCK: RECEPTOR,
     GAP_SECOND_BLOCK: RECEPTOR,
     GAP_FIRST_BLOCK_CONC: 1.5,
-    GAP_SECOND_BLOCK_CONC: 0
+    GAP_SECOND_BLOCK_CONC: 1.5
 }
 
 """

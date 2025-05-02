@@ -19,11 +19,19 @@ def run():
 
 def create_simulation_folder():
     basedir = os.path.abspath(os.path.dirname(__file__))
-    path = os.path.join(basedir, "Retinotectal_Results")
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    folder_name = f"simulation_run_{timestamp}"
-    new_folder_path = os.path.join(path, folder_name)
-    os.mkdir(new_folder_path)
+    results_dir = os.path.join(basedir, "Retinotectal_Results")
+
+    # Bereits in der Konfiguration hinterlegten Pfad (relativ) einfügen
+    existing_subpath = cfg.current_config.get(cfg.FOLDER_PATH, "")
+    target_base = os.path.join(results_dir, existing_subpath)
+
+    if cfg.FOLDER_NAME != "":
+        folder_name = cfg.current_config[cfg.FOLDER_NAME]
+    else:
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        folder_name = f"simulation_run_{timestamp}"
+    new_folder_path = os.path.join(target_base, folder_name)
+    os.makedirs(new_folder_path)
     cfg.current_config[cfg.FOLDER_PATH] = new_folder_path
     return new_folder_path
 
