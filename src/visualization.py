@@ -46,9 +46,31 @@ def visualize_image(image, title, rect=None):
     return fig
 
 
-def visualize_data_points(x, y, x_label, y_label, title, **kwargs):
+def visualize_data_points(x, y, x_label, y_label, title, growth_cones=None, **kwargs):
     fig, ax = plt.subplots(figsize=(10, 10))
-    ax.plot(x, y, '*', **kwargs)
+    if growth_cones is not None:
+        # Identify indices
+        frozen_idx = [i for i, gc in enumerate(growth_cones) if getattr(gc, 'freeze', False)]
+        active_idx = [i for i in range(len(growth_cones)) if i not in frozen_idx]
+        # Active cones
+        ax.plot(
+            [x[i] for i in active_idx],
+            [y[i] for i in active_idx],
+            '*',
+            label='active'
+        )
+        # Frozen cones
+        if frozen_idx:
+            ax.plot(
+                [x[i] for i in frozen_idx],
+                [y[i] for i in frozen_idx],
+                '*',
+                color='gray',
+                alpha=0.6,
+                label='frozen'
+            )
+    else:
+        ax.plot(x, y, '*', **kwargs)
     ax.set_title(title)
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
@@ -109,7 +131,7 @@ def visualize_results_on_substrate(result, substrate):
 
 
 def visualize_projection(result, substrate, fit_type="linear", gc_scope="full", substrate_scope="full"
-                         , mutated_indexes=None):
+                         , mutated_indexes=None, growth_cones=None):
     # get values
     ap_values, nt_values = result.get_projection_id()
     # normalize values
@@ -118,7 +140,8 @@ def visualize_projection(result, substrate, fit_type="linear", gc_scope="full", 
 
     # create figure
     fig = visualize_data_points(nt_values_normalized, ap_values_normalized,
-                                "% n-t Axis of Retina","% a-p Axis of Target", "Projection Mapping")
+                                "% n-t Axis of Retina","% a-p Axis of Target", "Projection Mapping",
+                                growth_cones=growth_cones)
     # calculate regression
     try:
         if fit_type == "linear":
