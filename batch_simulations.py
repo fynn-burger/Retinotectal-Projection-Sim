@@ -2,8 +2,9 @@
 import itertools
 import subprocess
 
-from build import config as cfg, object_factory
+from build import config as cfg
 import main  # assumes main.py has a run() function
+from experiments.
 
 subprocess.run([
     "osascript",
@@ -17,11 +18,10 @@ subprocess.run([
     'tell application "Amphetamine" to start new session with options {displaySleepAllowed:false}'
 ])  # :contentReference[oaicite:0]{index=0}
 
-cfg.current_config[cfg.FOLDER_PATH] = "Compression_Sigmoid_Height_Test" # what name should your folder have
+cfg.current_config[cfg.FOLDER_PATH] = "Temporal_Expansion_test" # what name should your folder have
 # 1) define your sweep
 sweeps = {
-    cfg.SIGMOID_HEIGHT: [3000, 6000, 30000],
-    cfg.SUBSTRATE_SCOPE: ["anterior"]
+    cfg.FF_INTER: [True, False]
 }
 
 
@@ -43,7 +43,7 @@ for combo in itertools.product(*values):
     cfg.current_config[cfg.FOLDER_NAME] = combo_tag
 
     # 5) run it
-    main.run()
+    main.run() # change to polarity_reversal_new_adaptation.run() if applicable
 
 
 # 3) Beende die Amphetamine-Session

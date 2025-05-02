@@ -108,6 +108,8 @@ class Simulation:
         for step_current in range(self.num_steps):
             if step_current % 250 == 0:
                 progress = int((step_current / self.num_steps) * 100)
+                print(progress)
+
 
             for gc in self.growth_cones:
                 if not gc.freeze:  # Check if the growth cone is not frozen
@@ -134,8 +136,9 @@ class Simulation:
             if step_current in self.interim_results:
                 # runtime should not be relevant -> set to 0
                 interim_results = vz.visualize_projection(Result(self, 0, self.config), self.substrate,
-                                        gc_scope=self.gc_scope, substrate_scope=self.substrate_scope)
-
+                                        gc_scope=self.gc_scope, substrate_scope=self.substrate_scope,
+                                                          growth_cones=self.growth_cones,)
+                print(os.path)
                 interim_results.savefig(os.path.join(cfg.current_config.get(cfg.FOLDER_PATH),
                                                      f"interim_result_step{step_current}.png"))
                 interim_results.show()

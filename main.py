@@ -19,7 +19,7 @@ def run():
 
 def create_simulation_folder():
     basedir = os.path.abspath(os.path.dirname(__file__))
-    results_dir = os.path.join(basedir, "Retinotectal_Results")
+    results_dir = os.path.join(basedir, "Retinotectal_Simulation_Results")
 
     # Bereits in der Konfiguration hinterlegten Pfad (relativ) einfügen
     existing_subpath = cfg.current_config.get(cfg.FOLDER_PATH, "")

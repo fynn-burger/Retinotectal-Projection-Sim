@@ -359,7 +359,7 @@ def get_default_config(substrate_type):
 
 custom_config = {
     # GC Parameters
-    GC_COUNT: 200,
+    GC_COUNT: 20,
     GC_SIZE: 2,
     GC_R_DECAY: 0.15,
     GC_L_DECAY: 0.15,
@@ -368,19 +368,19 @@ custom_config = {
     GC_R_SHIFT: 0,
     GC_L_SHIFT: 0,
     RHO: 0.7,  #0.7
-    GC_SCOPE: "full",
+    GC_SCOPE: "temporal",
 
     # Interaction Toggles
     FORWARD_SIG: True,
     REVERSE_SIG: True,
-    FF_INTER: True,
+    FF_INTER: False,
     FT_INTER: True,
     CIS_INTER: True,
 
     # Interaction Parameters
     SIGMOID_STEEPNESS: 4,
     SIGMOID_SHIFT: 1.75,
-    SIGMOID_HEIGHT: 5000,
+    SIGMOID_HEIGHT: 3000,
 
     # Adaptation
     ADAPTATION_ENABLED: True,
@@ -397,7 +397,7 @@ custom_config = {
     FORCE: False,
 
     # Mapping results nach ... Schritten -> Zeigt nicht an nach wie vielen es ist im moment
-    INTERIM_RESULTS: [],
+    INTERIM_RESULTS: [1000, 2000, 3000, 4000],
     FOLDER_PATH: "",
     FOLDER_NAME: "",
 
