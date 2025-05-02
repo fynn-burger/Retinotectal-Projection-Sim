@@ -5,7 +5,16 @@ from build import config as cfg
 
 def save_and_show(fig, path: str, show: bool = True):
     """Save figure to disk and optionally display it."""
-    fig.savefig(path)
+    base, ext = os.path.splitext(path)
+    candidate = path
+    counter = 1
+
+    # bump the filename until we find one that doesn't exist
+    while os.path.exists(candidate):
+        candidate = f"{base}_{counter}{ext}"
+        counter += 1
+
+    fig.savefig(candidate)
     if show:
         fig.show()
 

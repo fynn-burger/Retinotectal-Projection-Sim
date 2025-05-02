@@ -18,10 +18,10 @@ subprocess.run([
     'tell application "Amphetamine" to start new session with options {displaySleepAllowed:false}'
 ])  # :contentReference[oaicite:0]{index=0}
 
-cfg.current_config[cfg.FOLDER_PATH] = "show=False" # what name should your folder have
+cfg.current_config[cfg.FOLDER_PATH] = "Polarity_Reversal_1" # what name should your folder have
 # 1) define your sweep
 sweeps = {
-    cfg.FF_INTER: [True]
+    cfg.SIGMOID_SHIFT: [4.25, 4.5, 4.75]
 }
 
 
@@ -43,7 +43,8 @@ for combo in itertools.product(*values):
     cfg.current_config[cfg.FOLDER_NAME] = combo_tag
 
     # 5) run it
-    main.run() # change to two_phase_experiments.run() if applicable
+    # main.run()
+    two_phase_experiments.run()
 
 
 # 3) Beende die Amphetamine-Session
