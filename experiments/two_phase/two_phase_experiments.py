@@ -15,6 +15,7 @@ def two_phase_run():
     cfg.current_config[cfg.GC_SCOPE] = "full"
     cfg.current_config[cfg.SUBSTRATE_SCOPE] = "full"
     cfg.current_config[cfg.FF_INTER] = False
+    cfg.current_config[cfg.INTERIM_RESULTS] = []
 
     # run simulation with first gcs and freeze them
     simulation_1 = object_factory.build_default()
@@ -33,6 +34,7 @@ def two_phase_run():
     cfg.current_config[cfg.GC_SCOPE] = "nasal"
     cfg.current_config[cfg.SUBSTRATE_SCOPE] = "full"
     cfg.current_config[cfg.FF_INTER] = True
+    cfg.current_config[cfg.INTERIM_RESULTS] = [1000, 2000, 3000, 4000]
 
     # run simulation with first (freezed) and second gcs
     simulation_2 = object_factory.build_default()
@@ -44,6 +46,8 @@ def two_phase_run():
     second_gc_result = simulation_2.run()
     vz.plot_projection(second_gc_result, simulation_2.substrate, simulation_2.growth_cones,
                        cfg.current_config.get(cfg.SHOW_FIGURES))
+    vz.plot_adaptation_metrics(simulation_2.growth_cones, cfg.current_config.get(cfg.SHOW_FIGURES))
+    vz.plot_receptor_adaptation(simulation_2.growth_cones, cfg.current_config.get(cfg.SHOW_FIGURES))
 
 
 def run():

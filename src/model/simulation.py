@@ -1,6 +1,7 @@
 """
 Main module which executes simulation logic
 """
+import math
 import numpy as np
 import time
 from model.result import Result

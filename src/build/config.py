@@ -365,7 +365,7 @@ def get_default_config(substrate_type):
 
 custom_config = {
     # GC Parameters
-    GC_COUNT: 20,
+    GC_COUNT: 200,
     GC_SIZE: 2,
     GC_R_DECAY: 0.15,
     GC_L_DECAY: 0.15,
@@ -379,7 +379,7 @@ custom_config = {
     # Interaction Toggles
     FORWARD_SIG: True,
     REVERSE_SIG: True,
-    FF_INTER: False,
+    FF_INTER: True,
     FT_INTER: True,
     CIS_INTER: True,
 
@@ -399,7 +399,7 @@ custom_config = {
     STEP_NUM: 5000,
     X_STEP_POSSIBILITY: 0.50,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
     Y_STEP_POSSIBILITY: 0.50,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
-    SIGMA: 0.08,
+    SIGMA: 0.12,
     FORCE: False,
 
     # Mapping results nach ... Schritten -> Zeigt nicht an nach wie vielen es ist im moment
