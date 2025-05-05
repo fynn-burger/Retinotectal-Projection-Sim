@@ -3,8 +3,10 @@
 .idea/misc.xml
 .idea/other.xml
 .idea/workspace.xml
-/Results_Retinotectal_Simulations_Fynn/
-test.py
-test_potential calculation.py
-test_prob_density_Calculation.py
-curve_visualization_test.py
+
+Retinotectal_Simulation_Results/*
+!Retinotectal_Simulation_Results/
+!Retinotectal_Simulation_Results/.gitkeep
+
+/python_tests_fynn/
+/Retinotectal_Simulations_Powerpoints/

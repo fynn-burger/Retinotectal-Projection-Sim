@@ -5,7 +5,7 @@ Module providing the Substrate class for substrate representation and initializa
 import numpy as np
 import pandas as pd
 
-from build import config
+from build import config as cfg
 
 
 class BaseSubstrate:
@@ -91,6 +91,7 @@ class ContinuousGradientSubstrate(BaseSubstrate):
         self.cont_grad_l_shift = kwargs.get('cont_grad_l_shift')
         self.cont_grad_r_decay = kwargs.get('cont_grad_r_decay')
         self.cont_grad_l_decay = kwargs.get('cont_grad_l_decay')
+        self.scope = kwargs.get('substrate_scope')
 
     def initialize_substrate(self):
         """
@@ -111,6 +112,25 @@ class ContinuousGradientSubstrate(BaseSubstrate):
             self.ligands[row, :] = ligand_gradient
             self.receptors[row, :] = receptor_gradient
 
+        if cfg.current_config.get(cfg.SUBSTRATE_SCOPE) != "full":
+            cols = (int((self.cols - self.offset * 2) / 2) + 2 * self.offset)
+            self.cols = cols
+            if cfg.current_config.get(cfg.SUBSTRATE_SCOPE) == "anterior":
+                ligand_gradient = self.ligands[0][:cols]
+                receptor_gradient = self.receptors[0][:cols]
+            elif cfg.current_config.get(cfg.SUBSTRATE_SCOPE) == "posterior":
+                ligand_gradient = self.ligands[0][(cols - self.offset * 2):]
+                receptor_gradient = self.receptors[0][(cols - self.offset * 2):]
+            else:
+                raise Exception("Unknown substrate type")
+
+            new_ligands = np.empty((self.rows, len(ligand_gradient)))
+            new_receptors = np.empty((self.rows, len(receptor_gradient)))
+            for row in range(self.rows):
+                new_ligands[row, :] = ligand_gradient
+                new_receptors[row, :] = receptor_gradient
+            self.ligands = new_ligands
+            self.receptors = new_receptors
 
 class WedgeSubstrate(BaseSubstrate):
     def __init__(self, rows, cols, offset, **kwargs):
@@ -204,7 +224,7 @@ class GapSubstrate(BaseSubstrate):
 
         # First part: Filled with Signals
         for col in range(first_part):
-            if self.first_block == config.LIGAND:
+            if self.first_block == cfg.LIGAND:
                 self.set_col_ligand_only(col, self.first_block_conc)
             else:
                 self.set_col_receptor_only(col, self.first_block_conc)
@@ -215,7 +235,7 @@ class GapSubstrate(BaseSubstrate):
 
         # Final part: Filled with Signals
         for col in range(second_part, self.cols):
-            if self.second_block == config.LIGAND:
+            if self.second_block == cfg.LIGAND:
                 self.set_col_ligand_only(col, self.second_block_conc)
             else:
                 self.set_col_receptor_only(col, self.second_block_conc)
@@ -226,7 +246,7 @@ class GapSubstrateInverted(GapSubstrate):
         first_part = int(self.cols * self.begin)
         second_part = first_part + int(self.cols * self.end)
         for col in range(first_part, second_part):
-            if self.first_block == config.LIGAND:
+            if self.first_block == cfg.LIGAND:
                 self.set_col_ligand_only(col, self.first_block_conc)
             else:
                 self.set_col_receptor_only(col, self.first_block_conc)
