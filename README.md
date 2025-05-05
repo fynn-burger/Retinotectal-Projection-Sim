@@ -1,7 +1,8 @@
 # Topographic-Projection-Sim
+Copyright (c) 2024 Yavuz Karaca
 
 ## Overview
-This repository hosts a Python-based computational model for simulating topographic projections. 
+This repository hosts a Python-based computational model for simulating retinotectal projections. 
 Derived from a thorough analysis of a [MATLAB implementation](https://github.com/elifesciences-publications/RTP_Co-adapt_Model), 
 this project translates and refines key concepts and methods into Python to enhance flexibility and experimental utility. 
 The model explores the Ephrin-A/EphA interaction, a key molecular mechanism of axon guidance. 
@@ -14,10 +15,10 @@ and balancing of forward and reverse signaling as the driving forces of adaptive
 - "Ephrin-A/EphA specific co-adaptation as a novel mechanism in topographic axon guidance" by Fiederling et al., eLife, 2017. [Read the paper](http://dx.doi.org/10.7554/eLife.25533)
 
 ## Acknowledgments
-Special thanks to Dr. Franco Weth from KIT's Department of Neurobiology for his expert guidance throughout this project.
+Special thanks to Dr. Franco Weth from KIT's Department of Neurobiology for his expert guidance throughout this project. Additional thanks to Fynn Burger for helping with the implementation of several parameters, identifying/fixing bugs and analyzing the simulation logic.
 
 ## Features
-- **Implemented in Python**: Completely reworked and refined in Python for better accessibility.
+- **Implemented in Python**: Completely reworked and refined in Python for improved accessibility, cleaner software design and enhanced performance.
 - **Increased Configurability**: Enhanced parameter configurability allows for extensive experimentation.
 - **Advanced Visualization Tools**: Integrated visualization tools to better observe and analyze the effects of parameter changes and simulation results.
 
