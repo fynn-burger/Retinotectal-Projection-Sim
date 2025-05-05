@@ -107,9 +107,10 @@ class Simulation:
 
         for step_current in range(self.num_steps):
             if step_current % 250 == 0:
+                print(f"Current Step: {step_current}")
                 progress = int((step_current / self.num_steps) * 100)
-                print(progress)
 
+            # TODO: @Performance Parallelize with futures
 
             for gc in self.growth_cones:
                 if not gc.freeze:  # Check if the growth cone is not frozen
