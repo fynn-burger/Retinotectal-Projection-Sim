@@ -3,7 +3,8 @@ from build import object_factory
 from visualization import utils as vz
 from build import utils
 
-def two_phase_run():
+
+def run():
     """
     Polarity reversal experiment with two nasal populations as waves that grow onto substrate in sequential order.
     :return:
@@ -48,11 +49,6 @@ def two_phase_run():
                        cfg.current_config.get(cfg.SHOW_FIGURES))
     vz.plot_adaptation_metrics(simulation_2.growth_cones, cfg.current_config.get(cfg.SHOW_FIGURES))
     vz.plot_receptor_adaptation(simulation_2.growth_cones, cfg.current_config.get(cfg.SHOW_FIGURES))
-
-
-def run():
-    two_phase_run()
-
 
 if __name__ == '__main__':
     run()

@@ -10,6 +10,7 @@ from visualization import utils as vz
 import random
 from build import config as cfg
 import os
+import sys
 
 progress = 0  # Global progress variable
 
@@ -186,7 +187,7 @@ class Simulation:
         new_x = gc.pos[0] + xt_direction
         new_y = gc.pos[1] + yt_direction
 
-        if not clamp_to_boundaries(new_x, new_y, self.substrate, gc.radius):
+        if not clamp_to_boundaries(new_x, new_y, self.substrate, self.substrate.offset):
             return self.gen_random_step(gc)
         return new_x, new_y
 
@@ -196,14 +197,13 @@ Utility functions needed for step decision
 """
 
 
-def clamp_to_boundaries(new_x, new_y, substrate, size):
+def clamp_to_boundaries(new_x, new_y, substrate, offset):
 
-    if new_x < size or new_x > substrate.cols - 1- size:
+    if new_x < offset or new_x > substrate.cols - 1- offset:
         return False
 
-    if new_y < size or new_y > substrate.rows - 1 - size:
+    if new_y < offset or new_y > substrate.rows - 1 - offset:
         return False
-
     return True
 
 

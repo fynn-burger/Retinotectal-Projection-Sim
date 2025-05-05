@@ -25,7 +25,7 @@ class BaseSubstrate:
         """
         self.rows = rows + offset * 2
         self.cols = cols + offset * 2
-        self.offset = offset  # is equal to gc_size
+        self.offset = offset
 
         # Set extra attributes from kwargs
         for key, value in kwargs.items():

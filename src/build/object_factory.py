@@ -1,7 +1,7 @@
 """
 Module for setting up all the objects in the model.
 """
-
+import math
 import numpy as np
 
 from build import config as cfg
@@ -71,7 +71,13 @@ def build_substrate(config):
     # Extract attributes from the configuration
     rows = config.get(cfg.ROWS)
     cols = config.get(cfg.COLS)
-    offset = config.get(cfg.GC_SIZE)
+
+    # --- CHANGED: derive offset from Gaussian threshold and a-parameter ---
+    gauss_a = config.get(cfg.GC_GAUSS_DECAY)             # new config param
+    threshold = config.get(cfg.GC_GAUSS_THRESHOLD)     # new config param
+    radius = math.ceil(math.sqrt(-math.log(threshold) / gauss_a)) # Das nochmal überprüfen
+    offset = radius  # dynamic offset replaces fixed GC_SIZE
+
     substrate_type = config.get(cfg.SUBSTRATE_TYPE)
 
     if substrate_type == cfg.CONTINUOUS_GRADIENTS:
@@ -135,7 +141,11 @@ def initialize_growth_cones(config):
     # Extract parameters from the configuration
     growth_cones = []
     gc_count = config.get(cfg.GC_COUNT)
-    size = config.get(cfg.GC_SIZE)
+    # --- CHANGED: derive offset from Gaussian threshold and a-parameter ---
+    gauss_a = config.get(cfg.GC_GAUSS_DECAY)             # new config param
+    threshold = config.get(cfg.GC_GAUSS_THRESHOLD)     # new config param
+    radius = math.sqrt(-math.log(threshold) / gauss_a)
+    offset = math.ceil(radius)  # dynamic offset replaces fixed GC_SIZE
     rows = config.get(cfg.ROWS)
     rho = config.get(cfg.RHO)
     cols = config.get(cfg.COLS)
@@ -155,12 +165,12 @@ def initialize_growth_cones(config):
         ligands.append(gc_l_factor * np.exp(-gc_l_decay * (position + gc_l_shift - center)))
 
     # Create an array of evenly distributed y-positions for the growth cones
-    y_positions = np.linspace(size, rows - 1 + size, gc_count, dtype=int)
+    y_positions = np.linspace(offset, rows - 1 + offset, gc_count, dtype=int)
 
     for i in range(gc_count):
         # Create a GrowthCone instance and initialize it
         pos_y = y_positions[i]
-        gc = GrowthCone((size, pos_y), size, ligands[i], receptors[i], i, rho)
+        gc = GrowthCone((offset, pos_y), radius, ligands[i], receptors[i], i, rho)
         growth_cones.append(gc)
 
     if cfg.current_config.get(cfg.GC_SCOPE) != "full":
@@ -172,8 +182,6 @@ def initialize_growth_cones(config):
             good_gcs = growth_cones[half_len:gc_len]
         else:
             raise Exception("Unknown half gradient type")
-
-
         growth_cones = good_gcs  # only use "good gcs for simulation"
 
     return growth_cones

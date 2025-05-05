@@ -10,7 +10,8 @@ Module providing configuration settings for a retinotectal projection model.
 
 # Simulation Basic Parameters
 GC_COUNT = "gc_count"
-GC_SIZE = "gc_size"
+GC_GAUSS_DECAY = "gc_gauss_decay"
+GC_GAUSS_THRESHOLD = "gc_gauss_threshold"
 STEP_SIZE = "step_size"
 STEP_NUM = "step_num"
 
@@ -98,7 +99,8 @@ GAP_SECOND_BLOCK_CONC = "gap_second_block_conc"
 
 simulation_basic = {
     GC_COUNT: 20,
-    GC_SIZE: 3,
+    GC_GAUSS_DECAY: 0.5,
+    GC_GAUSS_THRESHOLD: 0.01,
     STEP_SIZE: 1,
     STEP_NUM: 8000,
 }
@@ -194,7 +196,8 @@ gap_inv_substrate = {
 default_configs = {
     "CONTINUOUS_GRADIENTS": {
         GC_COUNT: 15,  # 100
-        GC_SIZE: 3,
+        GC_GAUSS_DECAY: 0.5,
+        GC_GAUSS_THRESHOLD: 0.01,
         STEP_SIZE: 1,
         STEP_NUM: 5000,  # 8000
         GC_R_DECAY: 1.5,
@@ -237,7 +240,8 @@ default_configs = {
     },
     "WEDGES": {
         GC_COUNT: 10,
-        GC_SIZE: 10,
+        GC_GAUSS_DECAY: 0.5,
+        GC_GAUSS_THRESHOLD: 0.01,
         STEP_SIZE: 1,
         STEP_NUM: 8000,
         GC_R_DECAY: 1.5,
@@ -272,7 +276,8 @@ default_configs = {
     },
     "STRIPE": {
         GC_COUNT: 10,
-        GC_SIZE: 10,
+        GC_GAUSS_DECAY: 0.5,
+        GC_GAUSS_THRESHOLD: 0.01,
         STEP_SIZE: 1,
         STEP_NUM: 8000,
         GC_R_DECAY: 1.5,
@@ -310,7 +315,8 @@ default_configs = {
     },
     "GAP": {
         GC_COUNT: 5,
-        GC_SIZE: 5,
+        GC_GAUSS_DECAY: 0.5,
+        GC_GAUSS_THRESHOLD: 0.01,
         STEP_SIZE: 2,
         STEP_NUM: 8000,
         GC_R_DECAY: 1.5,
@@ -365,8 +371,9 @@ def get_default_config(substrate_type):
 
 custom_config = {
     # GC Parameters
-    GC_COUNT: 200,
-    GC_SIZE: 2,
+    GC_COUNT: 20,
+    GC_GAUSS_DECAY: 0.5,
+    GC_GAUSS_THRESHOLD: 0.01,
     GC_R_DECAY: 0.15,
     GC_L_DECAY: 0.15,
     GC_R_FACTOR: 1,
@@ -374,12 +381,12 @@ custom_config = {
     GC_R_SHIFT: 0,
     GC_L_SHIFT: 0,
     RHO: 0.7,  #0.7
-    GC_SCOPE: "temporal",
+    GC_SCOPE: "full",
 
     # Interaction Toggles
     FORWARD_SIG: True,
     REVERSE_SIG: True,
-    FF_INTER: True,
+    FF_INTER: False,
     FT_INTER: True,
     CIS_INTER: True,
 
@@ -390,26 +397,26 @@ custom_config = {
 
     # Adaptation
     ADAPTATION_ENABLED: True,
-    ADAPTATION_MU: 0.09,
+    ADAPTATION_MU: 0.01,
     ADAPTATION_LAMBDA: 0.002,
     ADAPTATION_HISTORY: 10,
 
     # Step Parameters
     STEP_SIZE: 1,
     STEP_NUM: 5000,
-    X_STEP_POSSIBILITY: 0.50,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
+    X_STEP_POSSIBILITY: 0.55,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
     Y_STEP_POSSIBILITY: 0.50,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
-    SIGMA: 0.12,
+    SIGMA: 0.08,
     FORCE: False,
 
     # Mapping results nach ... Schritten -> Zeigt nicht an nach wie vielen es ist im moment
-    INTERIM_RESULTS: [1000, 2000, 3000, 4000],
+    INTERIM_RESULTS: [],
     FOLDER_PATH: "",
     FOLDER_NAME: "",
     SHOW_FIGURES: False,
 
     # Substrate Basics
-    SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
+    SUBSTRATE_TYPE: GAP_INV,
     ROWS: 8,
     COLS: 50,
 
@@ -430,8 +437,8 @@ custom_config = {
     STRIPE_WIDTH: 6.625,
 
     # Gap substrate Values
-    GAP_BEGIN: 0.6,
-    GAP_END: 0.05,
+    GAP_BEGIN: 0.4,
+    GAP_END: 0.4,
     GAP_FIRST_BLOCK: RECEPTOR,
     GAP_SECOND_BLOCK: RECEPTOR,
     GAP_FIRST_BLOCK_CONC: 1.5,

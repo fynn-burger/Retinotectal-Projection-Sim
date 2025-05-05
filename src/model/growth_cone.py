@@ -18,9 +18,8 @@ class GrowthCone:
         potential (float): Current potential of the growth cone.
     """
 
-    def __init__(self, position, size, ligand, receptor, id, rho, freeze=False, marked=False):
+    def __init__(self, position, radius, ligand, receptor, id, rho, freeze=False, marked=False):
         self.pos = position
-        self.radius = size
         '''
         self.ligand_current = ligand
         self.receptor_current = receptor
@@ -31,6 +30,7 @@ class GrowthCone:
         self.outer_receptor_current = receptor * rho
         self.inner_ligand_current = ligand * (1 - rho)
         self.inner_receptor_current = receptor * (1 - rho)
+        self.radius = radius
 
         self.potential = 0
         self.adap_co = 1  # Adaptation coefficient starts at 1

@@ -1,5 +1,4 @@
 from build import object_factory
-import os
 from build import config as cfg
 from build import utils
 from visualization import utils as vz
