@@ -28,7 +28,7 @@ class TestGrowthCone(unittest.TestCase):
         h = 5
         self.growth_cone.calculate_adaptation(mu, lambda_, h)
         # Test the values of adap_co, reset_force_receptor, and reset_force_ligand
-        # This test may require more specific checks based on the adaptation formula
+        # This tests may require more specific checks based on the adaptation formula
 
     def test_apply_adaptation(self):
         self.growth_cone.apply_adaptation()
