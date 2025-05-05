@@ -103,8 +103,6 @@ class Simulation:
         """
         Iteratively processes each simulation step, generating random steps, and making stepping decisions.
         """
-        global progress
-
         for step_current in range(self.num_steps):
             if step_current % 250 == 0:
                 print(f"Current Step: {step_current}")
