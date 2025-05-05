@@ -3,6 +3,7 @@
 .idea/misc.xml
 .idea/other.xml
 .idea/workspace.xml
+.idea/shelf
 
 Retinotectal_Simulation_Results/*
 !Retinotectal_Simulation_Results/
