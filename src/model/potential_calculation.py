@@ -4,19 +4,14 @@ Module providing all methods needed for guidance potential calculation.
 
 import math
 import numpy as np
-from model.utils import make_gauss_kernel
 
 
-def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inter_on, ft_inter_on, cis_inter_on,
-                        step, num_steps, sigmoid_steepness, sigmoid_shift, sigmoid_height):
+def calculate_potential(gc, pos, substrate, forward_on, reverse_on, ff_inter_on, ft_inter_on, cis_inter_on,
+                        step, num_steps, sigmoid_steepness, sigmoid_shift, sigmoid_height, all_gc_lig, all_gc_rec):
     """
     Calculate guidance potential for a growth cone (gc) in a model.
     """
-
-    # Precompute Gaussian kernel sum for cis-interaction (always available)
-    a = gc.gauss_a
-    thr = gc.threshold
-    _, kernel_sum = make_gauss_kernel(a, thr)
+    outer_lig_patch, outer_rec_patch = create_outer_patches(gc, pos, substrate)
 
     # Initialize interaction values
     trans_sig_fwd = trans_sig_rev = 0
@@ -26,16 +21,17 @@ def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inte
 
     # Compute interactions only if needed
     if ft_inter_on:
-        ft_ligands, ft_receptors = ft_interaction(gc, pos, substrate)
-        trans_sig_fwd = gc.outer_receptor_current * ft_ligands
-        trans_sig_rev = gc.outer_ligand_current * ft_receptors
+        trans_sig_fwd = (outer_rec_patch * substrate.ligands).sum()
+        trans_sig_rev = (outer_lig_patch * substrate.receptors).sum()
     if ff_inter_on:
         ff_coef = calculate_ff_coef(step, num_steps, sigmoid_steepness, sigmoid_shift, sigmoid_height)
-        ff_ligands, ff_receptors = ff_interaction(gc, pos, gcs)
-        ff_sig_fwd = gc.outer_receptor_current * ff_coef * ff_ligands
-        ff_sig_rev = gc.outer_ligand_current * ff_coef * ff_receptors
+        other_gc_lig_patch = all_gc_lig - outer_lig_patch
+        other_gc_rec_patch = all_gc_rec - outer_rec_patch
+        ff_sig_fwd = (other_gc_lig_patch * outer_rec_patch * ff_coef).sum()
+        ff_sig_rev = (other_gc_rec_patch * outer_lig_patch * ff_coef).sum()
     if cis_inter_on:
-        cis_sig_fwd = cis_sig_rev = gc.inner_ligand_current * gc.inner_receptor_current * kernel_sum
+        inner_lig_patch, inner_rec_patch = create_inner_patches(gc)
+        cis_sig_fwd = cis_sig_rev = (inner_lig_patch * inner_rec_patch).sum()
 
     # Calculate the forward and reverse signals based on flags
     if forward_on:
@@ -51,53 +47,6 @@ def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inte
     return abs(math.log(reverse_sig) - math.log(forward_sig))
 
 
-
-def ft_interaction(gc, pos, substrate):
-    """
-    Fiber-target: Gaussian-weighted sum over substrate around pos.
-    Returns ligand_sum, receptor_sum.
-    """
-    a = gc.gauss_a
-    thr = gc.threshold
-    G, _ = make_gauss_kernel(a, thr)
-    radius = G.shape[0] // 2
-    x, y = int(pos[0]), int(pos[1])
-    x0, x1 = x - radius, x + radius + 1
-    y0, y1 = y - radius, y + radius + 1
-    sub_lig = substrate.ligands[y0:y1, x0:x1]
-    sub_rec = substrate.receptors[y0:y1, x0:x1]
-    # bounds check
-    if sub_lig.shape != G.shape:
-        raise IndexError(f"FT interaction patch out-of-bounds at pos {pos} with kernel size {G.shape}")
-    ligand_sum = (G * sub_lig).sum()
-    receptor_sum = (G * sub_rec).sum()
-    return ligand_sum, receptor_sum
-
-
-def ff_interaction(gc1, pos, gcs):
-    """
-    Fiber-fiber: Gaussian-weighted sum over other growth cones' outer sensors.
-    Returns ligand_sum, receptor_sum.
-    """
-    a = gc1.gauss_a
-    thr = gc1.threshold
-    ligand_sum = receptor_sum = 0.0
-
-    for gc2 in gcs:
-        if gc1 == gc2:
-            # TODO: @Performance Sort GCs based on location and use pruning algorithms
-            # Eliminate self from the gcs list, as self-comparison always matches
-            continue
-        d = math.dist(gc2.pos, pos)
-        w = math.exp(-a * d * d)
-        if w < thr:
-            continue
-        area = intersection_area(pos, gc2.pos, gc1.radius)
-        ligand_sum += w * gc2.outer_ligand_current * area
-        receptor_sum += w * gc2.outer_receptor_current * area
-    return ligand_sum, receptor_sum
-
-
 def calculate_ff_coef(step, num_steps, sigmoid_steepness, sigmoid_shift, sigmoid_height=1):
     """
     Calculate the ratio of steps taken using a sigmoid function, scaled by sigmoid_gain.
@@ -111,24 +60,29 @@ def calculate_ff_coef(step, num_steps, sigmoid_steepness, sigmoid_shift, sigmoid
     return (-np.exp(-safe_sigmoid) + 1) * sigmoid_height
 
 
-def intersection_area(gc1_pos, gc2_pos, radius):
-    """
-    Calculate the area of intersection between two circles (circumscribed around growth cones).
-    """
-    d = math.dist(gc1_pos, gc2_pos)  # Distance between the centers of the circles
+def create_outer_patches(gc, pos, substrate):
+    radius = math.floor(gc.radius)
+    x, y = pos[0], pos[1]
+    x0, x1 = x - radius, x + radius + 1
+    y0, y1 = y - radius, y + radius + 1
 
-    if d == 0:
-        # Total overlap
-        return radius * radius * math.pi
-    elif d > radius * 2:
-        # No overlap
-        return 0
-    else:
-        # Check figure intersection_area for visualization: sector = PBDC, triangle = PBEC
-        sector = 2 * radius ** 2 * math.acos(d / (2 * radius))
-        triangle = 0.5 * d * math.sqrt(4 * radius ** 2 - d ** 2)
-        if sector < triangle:
-            print(sector, triangle)
-        return (sector - triangle) * 2
+    lig_patch = np.zeros_like(substrate.ligands)
+    rec_patch = np.zeros_like(substrate.receptors)
+    lig_patch_values = gc.gauss_kernel * gc.outer_ligand_current
+    rec_patch_values = gc.gauss_kernel * gc.outer_receptor_current
+
+    lig_patch[y0:y1, x0:x1] += lig_patch_values
+    rec_patch[y0:y1, x0:x1] += rec_patch_values
+
+    return lig_patch, rec_patch
+
+
+
+def create_inner_patches(gc):
+    lig_patch = gc.gauss_kernel * gc.inner_ligand_current
+    rec_patch = gc.gauss_kernel * gc.inner_receptor_current
+
+    return lig_patch, rec_patch
+
 
 

@@ -23,7 +23,7 @@ def create_simulation_folder():
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         folder_name = f"simulation_run_{timestamp}"
     new_folder_path = os.path.join(target_base, folder_name)
-    os.makedirs(new_folder_path)
+    os.makedirs(new_folder_path, exist_ok=True)
     cfg.current_config[cfg.FOLDER_PATH] = new_folder_path
     return new_folder_path
 

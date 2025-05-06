@@ -10,7 +10,6 @@ from model.result import Result
 from model.potential_calculation import calculate_potential
 from visualization import utils as vz
 from build import config as cfg
-from utils import make_gauss_kernel
 
 
 progress = 0  # Global progress variable
@@ -100,7 +99,7 @@ class Simulation:
             all_gc_lig, all_gc_rec = self.fold_gcs()
 
         for gc in self.growth_cones:
-            gc.potential = calculate_potential(gc, gc.pos, self.growth_cones, self.substrate, self.forward_sig,
+            gc.potential = calculate_potential(gc, gc.pos, self.substrate, self.forward_sig,
                                                self.reverse_sig, self.ff_inter, self.ft_inter, self.cis_inter, 0,
                                                self.num_steps, self.sigmoid_steepness, self.sigmoid_shift,
                                                self.sigmoid_height, all_gc_lig, all_gc_rec)
@@ -131,14 +130,13 @@ class Simulation:
                     pos_new = self.gen_random_step(gc)
 
                     # first calculate the current potential, then the possible new one
-                    gc.potential = calculate_potential(gc, gc.pos, self.growth_cones, self.substrate,
+                    gc.potential = calculate_potential(gc, gc.pos, self.substrate,
                                                        self.forward_sig, self.reverse_sig, self.ff_inter,
                                                        self.ft_inter, self.cis_inter, step_current, self.num_steps,
                                                        self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height,
                                                        all_gc_lig, all_gc_rec)
 
-
-                    potential_new = calculate_potential(gc, pos_new, self.growth_cones, self.substrate,
+                    potential_new = calculate_potential(gc, pos_new, self.substrate,
                                                         self.forward_sig, self.reverse_sig, self.ff_inter,
                                                         self.ft_inter, self.cis_inter, step_current, self.num_steps,
                                                         self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height,
@@ -205,21 +203,20 @@ class Simulation:
 
     def fold_gcs(self):
         """Create field of folded gc sensor values via Gauss-kernel"""
-        a, thr = self.substrate.gauss_a, self.substrate.threshold
-        G, _ = make_gauss_kernel(a, thr)
-        radius = self.substrate.offset
 
         all_gc_lig = np.zeros_like(self.substrate.ligands)
         all_gc_rec = np.zeros_like(self.substrate.receptors)
         for gc in self.growth_cones:
+            radius = math.floor(gc.radius)
             x, y = gc.pos[0], gc.pos[1]
             x0, x1 = x - radius, x + radius + 1
             y0, y1 = y - radius, y + radius + 1
 
-            lig_patch = gc.outer_ligand_current * G
-            rec_patch = gc.outer_receptor_current * G
-            all_gc_lig[y0:y1, x0:x1] += lig_patch[:y1 - y0, :x1 - x0]
-            all_gc_rec[y0:y1, x0:x1] += rec_patch[:y1 - y0, :x1 - x0]
+            lig_patch = gc.outer_ligand_current * gc.gauss_kernel
+            rec_patch = gc.outer_receptor_current * gc.gauss_kernel
+            # ToDo implement errorcheck here
+            all_gc_lig[y0:y1, x0:x1] += lig_patch
+            all_gc_rec[y0:y1, x0:x1] += rec_patch
         return all_gc_lig, all_gc_rec
 
 

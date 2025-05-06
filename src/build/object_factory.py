@@ -72,10 +72,10 @@ def build_substrate(config):
     rows = config.get(cfg.ROWS)
     cols = config.get(cfg.COLS)
 
-    # --- CHANGED: derive offset from Gaussian threshold and a-parameter ---
-    gauss_a = config.get(cfg.GC_GAUSS_DECAY)             # new config param
-    threshold = config.get(cfg.GC_GAUSS_THRESHOLD)     # new config param
-    offset = math.ceil(math.sqrt(-math.log(threshold) / gauss_a)) # Das nochmal überprüfen
+
+    gauss_a = config.get(cfg.GC_GAUSS_DECAY)
+    threshold = config.get(cfg.GC_GAUSS_THRESHOLD)
+    offset = math.ceil(math.sqrt(-math.log(threshold) / gauss_a))
 
     substrate_type = config.get(cfg.SUBSTRATE_TYPE)
 
@@ -140,11 +140,11 @@ def initialize_growth_cones(config):
     # Extract parameters from the configuration
     growth_cones = []
     gc_count = config.get(cfg.GC_COUNT)
-    # --- CHANGED: derive offset from Gaussian threshold and a-parameter ---
-    gauss_a = config.get(cfg.GC_GAUSS_DECAY)             # new config param
-    threshold = config.get(cfg.GC_GAUSS_THRESHOLD)     # new config param
+    gauss_a = config.get(cfg.GC_GAUSS_DECAY)
+    threshold = config.get(cfg.GC_GAUSS_THRESHOLD)
     radius = math.sqrt(-math.log(threshold) / gauss_a)
-    offset = math.ceil(radius)  # dynamic offset replaces fixed GC_SIZE
+    offset = math.ceil(radius)
+    gauss_kernel = build_kernel(gauss_a, threshold)
     rows = config.get(cfg.ROWS)
     rho = config.get(cfg.RHO)
     cols = config.get(cfg.COLS)
@@ -169,7 +169,7 @@ def initialize_growth_cones(config):
     for i in range(gc_count):
         # Create a GrowthCone instance and initialize it
         pos_y = y_positions[i]
-        gc = GrowthCone((offset, pos_y), radius, ligands[i], receptors[i], i, rho)
+        gc = GrowthCone((offset, pos_y), radius, ligands[i], receptors[i], i, rho, gauss_kernel)
         growth_cones.append(gc)
 
     if cfg.current_config.get(cfg.GC_SCOPE) != "full":
@@ -184,3 +184,18 @@ def initialize_growth_cones(config):
         growth_cones = good_gcs  # only use "good gcs for simulation"
 
     return growth_cones
+
+
+def build_kernel(a, threshold):
+    """
+    Build unnormalized 2D Gaussian kernel with decay a and threshold cutoff.
+    Returns kernel array.
+    """
+    radius = math.floor(math.sqrt(-math.log(threshold) / a))
+    size = 2 * radius + 1
+    x_array = np.arange(size) - radius
+    y_array = x_array.copy()
+    X, Y = np.meshgrid(x_array, y_array, indexing='ij')
+    G = np.exp(-a * (X**2 + Y**2))
+    G[G < threshold] = 0.0
+    return G
