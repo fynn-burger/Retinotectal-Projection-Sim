@@ -75,8 +75,7 @@ def build_substrate(config):
     # --- CHANGED: derive offset from Gaussian threshold and a-parameter ---
     gauss_a = config.get(cfg.GC_GAUSS_DECAY)             # new config param
     threshold = config.get(cfg.GC_GAUSS_THRESHOLD)     # new config param
-    radius = math.ceil(math.sqrt(-math.log(threshold) / gauss_a)) # Das nochmal überprüfen
-    offset = radius  # dynamic offset replaces fixed GC_SIZE
+    offset = math.ceil(math.sqrt(-math.log(threshold) / gauss_a)) # Das nochmal überprüfen
 
     substrate_type = config.get(cfg.SUBSTRATE_TYPE)
 

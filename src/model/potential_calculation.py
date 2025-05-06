@@ -4,8 +4,7 @@ Module providing all methods needed for guidance potential calculation.
 
 import math
 import numpy as np
-from build import config as cfg
-from visualization import utils as vz
+from model.utils import make_gauss_kernel
 
 
 def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inter_on, ft_inter_on, cis_inter_on,
@@ -15,8 +14,8 @@ def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inte
     """
 
     # Precompute Gaussian kernel sum for cis-interaction (always available)
-    a = cfg.current_config[cfg.GC_GAUSS_DECAY]
-    thr = cfg.current_config[cfg.GC_GAUSS_THRESHOLD]
+    a = gc.gauss_a
+    thr = gc.threshold
     _, kernel_sum = make_gauss_kernel(a, thr)
 
     # Initialize interaction values
@@ -52,30 +51,14 @@ def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inte
     return abs(math.log(reverse_sig) - math.log(forward_sig))
 
 
-def make_gauss_kernel(a, threshold):
-    """
-    Build unnormalized 2D Gaussian kernel with decay a and threshold cutoff.
-    Returns kernel array and its sum.
-    """
-    r_exact = math.sqrt(-math.log(threshold) / a)
-    radius = math.ceil(r_exact)
-    size = 2 * radius + 1
-    x_array = np.arange(size) - radius
-    y_array = x_array.copy()
-    X, Y = np.meshgrid(x_array, y_array, indexing='ij')
-    G = np.exp(-a * (X**2 + Y**2))
-    G[G < threshold] = 0.0
-    kernel_sum = G.sum()
-    return G, kernel_sum
-
 
 def ft_interaction(gc, pos, substrate):
     """
     Fiber-target: Gaussian-weighted sum over substrate around pos.
     Returns ligand_sum, receptor_sum.
     """
-    a = cfg.current_config[cfg.GC_GAUSS_DECAY]
-    thr = cfg.current_config[cfg.GC_GAUSS_THRESHOLD]
+    a = gc.gauss_a
+    thr = gc.threshold
     G, _ = make_gauss_kernel(a, thr)
     radius = G.shape[0] // 2
     x, y = int(pos[0]), int(pos[1])
@@ -96,8 +79,8 @@ def ff_interaction(gc1, pos, gcs):
     Fiber-fiber: Gaussian-weighted sum over other growth cones' outer sensors.
     Returns ligand_sum, receptor_sum.
     """
-    a = cfg.current_config[cfg.GC_GAUSS_DECAY]
-    thr = cfg.current_config[cfg.GC_GAUSS_THRESHOLD]
+    a = gc1.gauss_a
+    thr = gc1.threshold
     ligand_sum = receptor_sum = 0.0
 
     for gc2 in gcs:
