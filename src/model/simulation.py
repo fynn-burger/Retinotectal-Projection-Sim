@@ -4,13 +4,14 @@ Main module which executes simulation logic
 import math
 import numpy as np
 import time
+import random
+
 from model.result import Result
 from model.potential_calculation import calculate_potential
 from visualization import utils as vz
-import random
 from build import config as cfg
-import os
-import sys
+from utils import make_gauss_kernel
+
 
 progress = 0  # Global progress variable
 
@@ -92,12 +93,14 @@ class Simulation:
         """
         Initializes the potential values for each growth cone.
         """
+        # Fold all gcs onto substrate
+        all_gc_lig, all_gc_rec = self.fold_gcs()
+
         for gc in self.growth_cones:
-            # Fold all gcs onto substrate
-            
             gc.potential = calculate_potential(gc, gc.pos, self.growth_cones, self.substrate, self.forward_sig,
                                                self.reverse_sig, self.ff_inter, self.ft_inter, self.cis_inter, 0,
-                                               self.num_steps, self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
+                                               self.num_steps, self.sigmoid_steepness, self.sigmoid_shift,
+                                               self.sigmoid_height)
 
             print(gc.__str__())
 
@@ -108,6 +111,7 @@ class Simulation:
         global progress
 
         for step_current in range(self.num_steps):
+            all_gc_lig, all_gc_rec = self.fold_gcs()
             if step_current % 250 == 0:
                 print(f"Current Step: {step_current}")
                 progress = int((step_current / self.num_steps) * 100)
@@ -190,6 +194,26 @@ class Simulation:
         if not clamp_to_boundaries(new_x, new_y, self.substrate, self.substrate.offset):
             return self.gen_random_step(gc)
         return new_x, new_y
+
+    def fold_gcs(self):
+        """Create field of folded gc sensor values via Gauss-kerne"""
+        a, thr = self.substrate.gauss_a, self.substrate.threshold
+        G, _ = make_gauss_kernel(a, thr)
+        radius = self.substrate.offset
+        rows, cols = self.substrate.rows, self.substrate.cols
+
+        all_gc_lig = np.zeros((rows, cols))
+        all_gc_rec = np.zeros((rows, cols))
+        for gc in self.growth_cones:
+            x, y = gc.pos[0], gc.pos[1]
+            x0, x1 = x - radius, x + radius + 1
+            y0, y1 = y - radius, y + radius + 1
+
+            lig_patch = gc.outer_ligand_current * G
+            rec_patch = gc.outer_receptor_current * G
+            all_gc_lig[y0:y1, x0:x1] += lig_patch[:y1 - y0, :x1 - x0]
+            all_gc_rec[y0:y1, x0:x1] += rec_patch[:y1 - y0, :x1 - x0]
+        return all_gc_lig, all_gc_rec
 
 
 """
