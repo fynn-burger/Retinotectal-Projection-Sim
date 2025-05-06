@@ -1,6 +1,7 @@
 import math
 import numpy as np
 
+
 def make_gauss_kernel(a, threshold):
     """
     Build unnormalized 2D Gaussian kernel with decay a and threshold cutoff.

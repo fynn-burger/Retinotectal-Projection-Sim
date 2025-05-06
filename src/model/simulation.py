@@ -94,13 +94,16 @@ class Simulation:
         Initializes the potential values for each growth cone.
         """
         # Fold all gcs onto substrate
-        all_gc_lig, all_gc_rec = self.fold_gcs()
+        all_gc_lig = np.zeros_like(self.substrate.ligands)
+        all_gc_rec = np.zeros_like(self.substrate.receptors)
+        if self.ff_inter:
+            all_gc_lig, all_gc_rec = self.fold_gcs()
 
         for gc in self.growth_cones:
             gc.potential = calculate_potential(gc, gc.pos, self.growth_cones, self.substrate, self.forward_sig,
                                                self.reverse_sig, self.ff_inter, self.ft_inter, self.cis_inter, 0,
                                                self.num_steps, self.sigmoid_steepness, self.sigmoid_shift,
-                                               self.sigmoid_height)
+                                               self.sigmoid_height, all_gc_lig, all_gc_rec)
 
             print(gc.__str__())
 
@@ -111,7 +114,10 @@ class Simulation:
         global progress
 
         for step_current in range(self.num_steps):
-            all_gc_lig, all_gc_rec = self.fold_gcs()
+            all_gc_lig = np.zeros_like(self.substrate.ligands)
+            all_gc_rec = np.zeros_like(self.substrate.receptors)
+            if self.ff_inter:
+                all_gc_lig, all_gc_rec = self.fold_gcs()
             if step_current % 250 == 0:
                 print(f"Current Step: {step_current}")
                 progress = int((step_current / self.num_steps) * 100)
@@ -128,13 +134,15 @@ class Simulation:
                     gc.potential = calculate_potential(gc, gc.pos, self.growth_cones, self.substrate,
                                                        self.forward_sig, self.reverse_sig, self.ff_inter,
                                                        self.ft_inter, self.cis_inter, step_current, self.num_steps,
-                                                       self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
+                                                       self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height,
+                                                       all_gc_lig, all_gc_rec)
 
 
                     potential_new = calculate_potential(gc, pos_new, self.growth_cones, self.substrate,
                                                         self.forward_sig, self.reverse_sig, self.ff_inter,
                                                         self.ft_inter, self.cis_inter, step_current, self.num_steps,
-                                                        self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
+                                                        self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height,
+                                                        all_gc_lig, all_gc_rec)
                     self.step_decision(gc, pos_new, potential_new)
 
             # show projection results based on array given in config
@@ -196,14 +204,13 @@ class Simulation:
         return new_x, new_y
 
     def fold_gcs(self):
-        """Create field of folded gc sensor values via Gauss-kerne"""
+        """Create field of folded gc sensor values via Gauss-kernel"""
         a, thr = self.substrate.gauss_a, self.substrate.threshold
         G, _ = make_gauss_kernel(a, thr)
         radius = self.substrate.offset
-        rows, cols = self.substrate.rows, self.substrate.cols
 
-        all_gc_lig = np.zeros((rows, cols))
-        all_gc_rec = np.zeros((rows, cols))
+        all_gc_lig = np.zeros_like(self.substrate.ligands)
+        all_gc_rec = np.zeros_like(self.substrate.receptors)
         for gc in self.growth_cones:
             x, y = gc.pos[0], gc.pos[1]
             x0, x1 = x - radius, x + radius + 1
