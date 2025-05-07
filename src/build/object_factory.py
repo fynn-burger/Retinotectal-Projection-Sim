@@ -9,6 +9,7 @@ from model.growth_cone import GrowthCone
 from model.simulation import Simulation
 from model.substrate import (ContinuousGradientSubstrate, WedgeSubstrate,
                              StripeSubstrate, GapSubstrate, GapSubstrateInverted)
+from build.utils import build_kernel
 
 
 def build_default() -> Simulation:
@@ -71,7 +72,6 @@ def build_substrate(config):
     # Extract attributes from the configuration
     rows = config.get(cfg.ROWS)
     cols = config.get(cfg.COLS)
-
 
     gauss_a = config.get(cfg.GC_GAUSS_DECAY)
     threshold = config.get(cfg.GC_GAUSS_THRESHOLD)
@@ -184,18 +184,3 @@ def initialize_growth_cones(config):
         growth_cones = good_gcs  # only use "good gcs for simulation"
 
     return growth_cones
-
-
-def build_kernel(a, threshold):
-    """
-    Build unnormalized 2D Gaussian kernel with decay a and threshold cutoff.
-    Returns kernel array.
-    """
-    radius = math.floor(math.sqrt(-math.log(threshold) / a))
-    size = 2 * radius + 1
-    x_array = np.arange(size) - radius
-    y_array = x_array.copy()
-    X, Y = np.meshgrid(x_array, y_array, indexing='ij')
-    G = np.exp(-a * (X**2 + Y**2))
-    G[G < threshold] = 0.0
-    return G
