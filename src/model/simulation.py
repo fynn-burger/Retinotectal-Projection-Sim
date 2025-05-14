@@ -9,15 +9,6 @@ from model.potential_calculation import calculate_potential
 from visualization import utils as vz
 import random
 from build import config as cfg
-import os
-
-progress = 0  # Global progress variable
-
-
-def get_updated_progress():
-    # print(progress)
-    return progress
-
 
 class Simulation:
     """
@@ -106,7 +97,6 @@ class Simulation:
         for step_current in range(self.num_steps):
             if step_current % 250 == 0:
                 print(f"Current Step: {step_current}")
-                progress = int((step_current / self.num_steps) * 100)
 
             # TODO: @Performance Parallelize with futures
 
@@ -114,6 +104,8 @@ class Simulation:
                 if not gc.freeze:  # Check if the growth cone is not frozen
                     if self.adaptation:
                         self.adapt_growth_cone(gc)
+
+
                     pos_new = self.gen_random_step(gc)
 
                     # do NOT recalculate the current potential for reduced time-complexity -> Try calculating it again
@@ -136,9 +128,6 @@ class Simulation:
                 # runtime should not be relevant -> set to 0
                 vz.plot_projection(Result(self, 0, self.config), self.substrate, self.growth_cones,
                                    show=cfg.current_config.get(cfg.SHOW_FIGURES), current_step=step_current)
-
-        progress = 100
-        # TODO: @Performance Early stopping mechanism based on total potential
 
     def adapt_growth_cone(self, gc):
         """
