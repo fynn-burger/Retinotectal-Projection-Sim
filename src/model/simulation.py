@@ -10,6 +10,7 @@ from visualization import utils as vz
 import random
 from build import config as cfg
 
+
 class Simulation:
     """
     Manages the simulation of growth cone dynamics within a defined substrate.
@@ -95,39 +96,43 @@ class Simulation:
         Iteratively processes each simulation step, generating random steps, and making stepping decisions.
         """
         for step_current in range(self.num_steps):
-            if step_current % 250 == 0:
-                print(f"Current Step: {step_current}")
+            self.print_progress(step_current)
+            self.handle_growth_cones(step_current)
+            self.create_interim_results(step_current)
 
-            # TODO: @Performance Parallelize with futures
+    def print_progress(self, step_current):
+        if step_current % 250 == 0:
+            print(f"Current Step: {step_current}")
 
-            for gc in self.growth_cones:
-                if not gc.freeze:  # Check if the growth cone is not frozen
-                    if self.adaptation:
-                        self.adapt_growth_cone(gc)
+    def handle_growth_cones(self, step_current):
+        for gc in self.growth_cones:
+            if gc.freeze:
+                continue
+            if self.adaptation:
+                self.adapt_growth_cone(gc)
 
+            pos_new = self.gen_random_step(gc)
 
-                    pos_new = self.gen_random_step(gc)
+            # do NOT recalculate the current potential for reduced time-complexity -> Try calculating it again
+            # I would do this but only when there are problems with stuck gcs
 
-                    # do NOT recalculate the current potential for reduced time-complexity -> Try calculating it again
-                    # I would do this but only when there are problems with stuck gcs
+            gc.potential = calculate_potential(gc, gc.pos, self.growth_cones, self.substrate,
+                                               self.forward_sig, self.reverse_sig, self.ff_inter,
+                                               self.ft_inter, self.cis_inter, step_current, self.num_steps,
+                                               self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
 
-                    gc.potential = calculate_potential(gc, gc.pos, self.growth_cones, self.substrate,
-                                                       self.forward_sig, self.reverse_sig, self.ff_inter,
-                                                       self.ft_inter, self.cis_inter, step_current, self.num_steps,
-                                                       self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
+            potential_new = calculate_potential(gc, pos_new, self.growth_cones, self.substrate,
+                                                self.forward_sig, self.reverse_sig, self.ff_inter,
+                                                self.ft_inter, self.cis_inter, step_current, self.num_steps,
+                                                self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
+            self.step_decision(gc, pos_new, potential_new)
 
-
-                    potential_new = calculate_potential(gc, pos_new, self.growth_cones, self.substrate,
-                                                        self.forward_sig, self.reverse_sig, self.ff_inter,
-                                                        self.ft_inter, self.cis_inter, step_current, self.num_steps,
-                                                        self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
-                    self.step_decision(gc, pos_new, potential_new)
-
-            # show projection results based on array given in config
-            if step_current in self.interim_results:
-                # runtime should not be relevant -> set to 0
-                vz.plot_projection(Result(self, 0, self.config), self.substrate, self.growth_cones,
-                                   show=cfg.current_config.get(cfg.SHOW_FIGURES), current_step=step_current)
+    def create_interim_results(self, step_current):
+        # show projection results based on array given in config
+        if step_current in self.interim_results:
+            # runtime should not be relevant -> set to 0
+            vz.plot_projection(Result(self, 0, self.config), self.substrate, self.growth_cones,
+                               show=cfg.current_config.get(cfg.SHOW_FIGURES), current_step=step_current)
 
     def adapt_growth_cone(self, gc):
         """
