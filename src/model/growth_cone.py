@@ -27,10 +27,10 @@ class GrowthCone:
         '''
         self.ligand = ligand
         self.receptor = receptor
-        self.outer_ligand_current = ligand * rho
-        self.outer_receptor_current = receptor * rho
-        self.inner_ligand_current = ligand * (1 - rho)
-        self.inner_receptor_current = receptor * (1 - rho)
+        self.outer_ligand_current = self.ligand * rho
+        self.outer_receptor_current = self.receptor * rho
+        self.inner_ligand_current = self.ligand * (1 - rho)
+        self.inner_receptor_current = self.receptor * (1 - rho)
 
         self.potential = 0
         self.adap_co = 1  # Adaptation coefficient starts at 1
