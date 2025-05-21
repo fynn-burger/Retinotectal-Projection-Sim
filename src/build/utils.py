@@ -1,6 +1,9 @@
 import os
 import build.config as cfg
 import datetime
+import subprocess
+import math
+import numpy as np
 
 
 def create_simulation_folder():
@@ -8,10 +11,22 @@ def create_simulation_folder():
         os.path.join(
             os.path.dirname(__file__),
             os.pardir,
+            os.pardir,
             os.pardir
         )
     )
-    results_dir = os.path.join(basedir, "Retinotectal_Simulation_Results")
+    results_dir = os.path.join(basedir, "Retinotectal_Results")
+
+    branch = (
+        subprocess
+        .check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+        .strip()
+        .decode("utf-8")
+    )
+
+    # 5) Branch-spezifischer Ordner in Results
+    results_dir = os.path.join(results_dir, branch)
+
 
     # Bereits in der Konfiguration hinterlegten Pfad (relativ) einfügen
     existing_subpath = cfg.current_config.get(cfg.FOLDER_PATH, "")

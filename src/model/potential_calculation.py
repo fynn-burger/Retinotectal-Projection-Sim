@@ -166,8 +166,9 @@ def calculate_ff_coef(step, num_steps, sigmoid_steepness, sigmoid_shift, sigmoid
     step_ratio = step / num_steps
     sigmoid_adjustment = (step_ratio * sigmoid_shift) ** sigmoid_steepness
     safe_sigmoid = np.clip(sigmoid_adjustment, a_min=1e-10, a_max=None)  # Prevent log(0) which results in -inf
+    coeff = max((-np.exp(-safe_sigmoid) + 1) * sigmoid_height, 0)
 
-    return (-np.exp(-safe_sigmoid) + 1) * sigmoid_height
+    return coeff
 
 
 def create_outer_patches(gc, pos, substrate):

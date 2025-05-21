@@ -103,8 +103,8 @@ def visualize_substrate_separately(substrate):
 
 def visualize_growth_cones(gcs):
     # ToDo should be the sum of inner and outer receptors -> this does only work if rho = 1
-    receptors = np.array([gc.outer_receptor_current for gc in gcs])
-    ligands = np.array([gc.outer_ligand_current for gc in gcs])
+    receptors = np.array([gc.receptor for gc in gcs])
+    ligands = np.array([gc.ligand for gc in gcs])
 
     # Create the plot
     fig, ax = plt.subplots(figsize=(10, 7))
