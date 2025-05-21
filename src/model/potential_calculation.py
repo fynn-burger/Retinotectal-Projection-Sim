@@ -33,16 +33,16 @@ def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inte
     forward_sig = reverse_sig = 0
     if forward_on:
         trans_sig = gc_outer_receptor_sum * ft_ligands
-        cis_sig = gc_inner_receptor_sum * gc_inner_ligand_sum if cis_inter_on else 0
+        cis_sig = (gc_inner_receptor_sum * gc_inner_ligand_sum) + 0.1 * (gc_outer_receptor_sum * gc_outer_ligand_sum) \
+            if cis_inter_on else 0
         ff_sig = gc_outer_receptor_sum * ff_coef * ff_ligands
         forward_sig = trans_sig + cis_sig + ff_sig
-        # forward_sig = gc_outer_receptor_sum * (ft_ligands + (gc_inner_ligand_sum if cis_inter_on else 0) + (ff_coef * ff_ligands))
     if reverse_on:
         trans_sig = gc_outer_ligand_sum * ft_receptors
-        cis_sig = gc_inner_ligand_sum * gc_inner_receptor_sum if cis_inter_on else 0
+        cis_sig = (gc_inner_receptor_sum * gc_inner_ligand_sum) + 0.1 * (gc_outer_receptor_sum * gc_outer_ligand_sum) \
+            if cis_inter_on else 0
         ff_sig = gc_outer_ligand_sum * ff_coef * ff_receptors
         reverse_sig = trans_sig + cis_sig + ff_sig
-        # reverse_sig = gc_outer_ligand_sum * (ft_receptors + (gc_inner_receptor_sum if cis_inter_on else 0) + (ff_coef * ff_receptors))
 
     # Round and calculate the potential
     forward_sig = float("{:.6f}".format(forward_sig))
@@ -113,8 +113,9 @@ def calculate_ff_coef(step, num_steps, sigmoid_steepness, sigmoid_shift, sigmoid
     step_ratio = step / num_steps
     sigmoid_adjustment = (step_ratio * sigmoid_shift) ** sigmoid_steepness
     safe_sigmoid = np.clip(sigmoid_adjustment, a_min=1e-10, a_max=None)  # Prevent log(0) which results in -inf
+    coeff = max((-np.exp(-safe_sigmoid) + 1) * sigmoid_height, 0)
 
-    return (-np.exp(-safe_sigmoid) + 1) * sigmoid_height
+    return coeff
 
 
 def bounding_box(gc_pos, gc_size, substrate):
