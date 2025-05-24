@@ -62,7 +62,7 @@ def calculate_potential(gc, pos, substrate, forward_on, reverse_on, ff_inter_on,
         reverse_sig += ff_sig_rev
     # Calculate and add cis interaction
     if cis_inter_on:
-        cis_sig = calculate_cis_inter(gc)
+        cis_sig = calculate_cis_inter(gc, outer_lig_patch,outer_rec_patch)
         forward_sig += cis_sig
         reverse_sig += cis_sig
 
@@ -129,18 +129,23 @@ def calculate_ff_inter(step, num_steps, sigmoid_steepness, sigmoid_shift, sigmoi
     ff_sig_rev = (other_gc_rec_patch * lig_patch * ff_coef).sum()
     return ff_sig_fwd, ff_sig_rev
 
-def calculate_cis_inter(gc):
+def calculate_cis_inter(gc, outer_lig_patch, outer_rec_patch):
     """
-    Calculate cis interaction, by multiplying the folded patches of inner sensors and taking the sum
+    Calculate cis interaction, by adding the sum of the product of inner receptors and ligands and the sum of the
+    product of outer receptors and ligands. A Factor of 5 is applied to the inner sensors to account for a higher
+    binding constant within vesicles.
+
     Args:
         gc (GrowthCone): GrowthCone instance of the current growth cone.
+        outer_lig_patch (np.ndarray): Pre folded ligand values of current growth cone
+        outer_rec_patch (np.ndarray): Pre folded receptor values of current growth cone:
 
     Returns:
         cis_sig (float): Scalar of total cis interaction signal
 
     """
     inner_lig_patch, inner_rec_patch = create_inner_patches(gc)
-    cis_sig = (inner_lig_patch * inner_rec_patch).sum()
+    cis_sig = 5 * (inner_lig_patch * inner_rec_patch).sum() + (outer_lig_patch * outer_rec_patch).sum()
     return cis_sig
 
 
