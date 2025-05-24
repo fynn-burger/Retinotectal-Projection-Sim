@@ -154,14 +154,15 @@ def initialize_growth_cones(config):
     gc_l_shift = config.get(cfg.GC_L_SHIFT)
     gc_r_decay = config.get(cfg.GC_R_DECAY)
     gc_l_decay = config.get(cfg.GC_L_DECAY)
+    fsfac = 50/cols
 
     x_positions = np.linspace(1, cols, gc_count)
     center = (cols + 1) / 2
     receptors = []
     ligands = []
     for position in x_positions:
-        receptors.append(gc_r_factor * np.exp(gc_r_decay * (position + gc_r_shift - center)))
-        ligands.append(gc_l_factor * np.exp(-gc_l_decay * (position + gc_l_shift - center)))
+        receptors.append(gc_r_factor * np.exp(fsfac*gc_r_decay * (position + gc_r_shift - center)))
+        ligands.append(gc_l_factor * np.exp(fsfac*-gc_l_decay * (position + gc_l_shift - center)))
 
     # Create an array of evenly distributed y-positions for the growth cones
     y_positions = np.linspace(offset, rows - 1 + offset, gc_count, dtype=int)
