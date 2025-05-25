@@ -177,6 +177,8 @@ class Simulation:
         random_number = random.random()
         if random_number > probability:
             gc.take_step(pos_new, potential_new)
+        else:
+            gc.take_step(gc.pos, gc.potential)
 
     def gen_random_step(self, gc):
         """
@@ -227,7 +229,7 @@ Utility functions needed for step decision
 
 def clamp_to_boundaries(new_x, new_y, substrate, offset):
 
-    if new_x < offset or new_x > substrate.cols - 1- offset:
+    if new_x < offset or new_x > substrate.cols - 1 - offset:
         return False
 
     if new_y < offset or new_y > substrate.rows - 1 - offset:
