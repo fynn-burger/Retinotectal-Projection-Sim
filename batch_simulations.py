@@ -18,12 +18,16 @@ subprocess.run([
     'tell application "Amphetamine" to start new session with options {displaySleepAllowed:false}'
 ])  # :contentReference[oaicite:0]{index=0}
 
-cfg.current_config[cfg.FOLDER_PATH] = "Polarity_Reversal_new_sigma" # what name should your folder have
+cfg.current_config[cfg.FOLDER_PATH] = ("Knock_In") # what name should your folder have
 # 1) define your sweep
 sweeps = {
-    cfg.SIGMOID_SHIFT: [5.5],
-    cfg.SIGMOID_STEEPNESS: [4.25],
-    cfg.SIGMA: [0.1, 0.12]
+    cfg.SUBSTRATE_TYPE: [cfg.GAP],
+    cfg.CONT_GRAD_R_DECAY: [0.03],
+    cfg.CONT_GRAD_L_DECAY: [0.03],
+    cfg.GAP_FIRST_BLOCK_CONC: [0],
+    cfg.GAP_SECOND_BLOCK_CONC:[5, 7, 10],
+    cfg.X_STEP_POSSIBILITY: [0.65],
+    cfg.FF_INTER: [False]
 }
 
 
@@ -31,17 +35,14 @@ sweeps = {
 base = cfg.current_config.copy()
 keys, values = zip(*sweeps.items())
 
-'''
+
 selected_combos = [
-    (7, 6),
-    (6.5, 5.5),
-    (6, 5),
 ]
-'''
+
 
 for combo in itertools.product(*values):
-    #if combo not in selected_combos:
-        #continue
+    if selected_combos and combo not in selected_combos:
+        continue
     # 3) reset to base, then apply this combination
     cfg.current_config = base.copy()
     for k, v in zip(keys, combo):
@@ -55,8 +56,8 @@ for combo in itertools.product(*values):
     cfg.current_config[cfg.FOLDER_NAME] = combo_tag
 
     # 5) run it
-    # main.run()
-    two_phase_experiments.run()
+    main.run()
+    # two_phase_experiments.run()
 
 
 # 3) Beende die Amphetamine-Session

@@ -365,16 +365,16 @@ def get_default_config(substrate_type):
 
 custom_config = {
     # GC Parameters
-    GC_COUNT: 200,
+    GC_COUNT: 15,
     GC_SIZE: 2,
-    GC_R_DECAY: 0.15,
-    GC_L_DECAY: 0.15,
+    GC_R_DECAY: 0.05,
+    GC_L_DECAY: 0.05,
     GC_R_FACTOR: 1,
     GC_L_FACTOR: 1,
     GC_R_SHIFT: 0,
     GC_L_SHIFT: 0,
-    RHO: 0.7,  #0.7
-    GC_SCOPE: "temporal",
+    RHO: 1,  #0.7
+    GC_SCOPE: "full",
 
     # Interaction Toggles
     FORWARD_SIG: True,
@@ -384,14 +384,14 @@ custom_config = {
     CIS_INTER: True,
 
     # Interaction Parameters
-    SIGMOID_STEEPNESS: 4,
+    SIGMOID_STEEPNESS: 5,
     SIGMOID_SHIFT: 1.75,
-    SIGMOID_HEIGHT: 3000,
+    SIGMOID_HEIGHT: 7000,
 
     # Adaptation
     ADAPTATION_ENABLED: True,
-    ADAPTATION_MU: 0.09,
-    ADAPTATION_LAMBDA: 0.002,
+    ADAPTATION_MU: 0.2,
+    ADAPTATION_LAMBDA: 0.001,
     ADAPTATION_HISTORY: 10,
 
     # Step Parameters
@@ -403,7 +403,7 @@ custom_config = {
     FORCE: False,
 
     # Mapping results nach ... Schritten -> Zeigt nicht an nach wie vielen es ist im moment
-    INTERIM_RESULTS: [1000, 2000, 3000, 4000],
+    INTERIM_RESULTS: [1, 100, 500, 1000, 2000, 3000, 4000, 5000, 7500],
     FOLDER_PATH: "",
     FOLDER_NAME: "",
     SHOW_FIGURES: False,
@@ -411,13 +411,13 @@ custom_config = {
     # Substrate Basics
     SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
     ROWS: 8,
-    COLS: 50,
+    COLS: 200,
 
     # Continuous substrate values
-    CONT_GRAD_R_DECAY: 0.15,
-    CONT_GRAD_L_DECAY: 0.15,
-    CONT_GRAD_R_FACTOR: 3,
-    CONT_GRAD_L_FACTOR: 3,
+    CONT_GRAD_R_DECAY: 0.05,
+    CONT_GRAD_L_DECAY: 0.05,
+    CONT_GRAD_R_FACTOR: 25,
+    CONT_GRAD_L_FACTOR: 25,
     CONT_GRAD_R_SHIFT: 0,
     CONT_GRAD_L_SHIFT: 0,
     SUBSTRATE_SCOPE: "full",
@@ -430,12 +430,12 @@ custom_config = {
     STRIPE_WIDTH: 6.625,
 
     # Gap substrate Values
-    GAP_BEGIN: 0.6,
+    GAP_BEGIN: 0.4,
     GAP_END: 0.05,
     GAP_FIRST_BLOCK: RECEPTOR,
     GAP_SECOND_BLOCK: RECEPTOR,
-    GAP_FIRST_BLOCK_CONC: 1.5,
-    GAP_SECOND_BLOCK_CONC: 1.5
+    GAP_FIRST_BLOCK_CONC: 50,
+    GAP_SECOND_BLOCK_CONC: 50
 }
 
 """

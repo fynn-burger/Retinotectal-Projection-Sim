@@ -111,16 +111,13 @@ class Simulation:
             if self.adaptation:
                 self.adapt_growth_cone(gc)
 
-            pos_new = self.gen_random_step(gc)
-
-            # do NOT recalculate the current potential for reduced time-complexity -> Try calculating it again
-            # I would do this but only when there are problems with stuck gcs
-
+            # Calculate current potential of gc
             gc.potential = calculate_potential(gc, gc.pos, self.growth_cones, self.substrate,
                                                self.forward_sig, self.reverse_sig, self.ff_inter,
                                                self.ft_inter, self.cis_inter, step_current, self.num_steps,
                                                self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
-
+            # calculate potential of possible next step
+            pos_new = self.gen_random_step(gc)
             potential_new = calculate_potential(gc, pos_new, self.growth_cones, self.substrate,
                                                 self.forward_sig, self.reverse_sig, self.ff_inter,
                                                 self.ft_inter, self.cis_inter, step_current, self.num_steps,
@@ -202,8 +199,8 @@ def clamp_to_boundaries(new_x, new_y, substrate, size):
 
 def probabilistic_density(potential, sigma):
     # let this function as it is for now, it is already pretty intuitive if you know sigma is the standard deviation
-    #return math.exp(-potential ** 2 / (2 * sigma ** 2)) / (math.sqrt(2 * math.pi) * sigma)
-    return np.exp(- np.abs(potential) / sigma) / (2 * sigma)
+    return math.exp(-potential ** 2 / (2 * sigma ** 2)) / (math.sqrt(2 * math.pi) * sigma)
+    # return np.exp(- np.abs(potential) / sigma) / (2 * sigma)
 
 
 def calculate_step_probability(old_prob, new_prob):
