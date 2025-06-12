@@ -102,12 +102,17 @@ class ContinuousGradientSubstrate(BaseSubstrate):
         center = (self.cols - 2*self.offset + 1) / 2
 
         x_positions = np.linspace(1 - self.offset, self.cols - self.offset, self.cols)
+        """
+        # linear gradient
+        receptor_gradient = np.linspace(3.5248, 0.1712, self.cols)
+        ligand_gradient = np.linspace(0.1712, 3.5248, self.cols)
+        #receptor_gradient = np.zeros(self.cols)
+        """
         for position in x_positions:
             receptor_gradient.append(self.cont_grad_r_factor * np.exp(-self.cont_grad_r_decay *
                                                                       (position + self.cont_grad_r_shift - center)))
             ligand_gradient.append(self.cont_grad_l_factor * np.exp(self.cont_grad_l_decay *
                                                                     (position + self.cont_grad_l_shift - center)))
-
         for row in range(self.rows):
             self.ligands[row, :] = ligand_gradient
             self.receptors[row, :] = receptor_gradient
