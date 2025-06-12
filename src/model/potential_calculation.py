@@ -33,13 +33,13 @@ def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inte
     forward_sig = reverse_sig = 0
     if forward_on:
         trans_sig = gc_outer_receptor_sum * ft_ligands
-        cis_sig = (gc_inner_receptor_sum * gc_inner_ligand_sum) + 0.1 * (gc_outer_receptor_sum * gc_outer_ligand_sum) \
+        cis_sig = 5 * (gc_inner_receptor_sum * gc_inner_ligand_sum) + (gc_outer_receptor_sum * gc_outer_ligand_sum) \
             if cis_inter_on else 0
         ff_sig = gc_outer_receptor_sum * ff_coef * ff_ligands
         forward_sig = trans_sig + cis_sig + ff_sig
     if reverse_on:
         trans_sig = gc_outer_ligand_sum * ft_receptors
-        cis_sig = (gc_inner_receptor_sum * gc_inner_ligand_sum) + 0.1 * (gc_outer_receptor_sum * gc_outer_ligand_sum) \
+        cis_sig = 5 * (gc_inner_receptor_sum * gc_inner_ligand_sum) + (gc_outer_receptor_sum * gc_outer_ligand_sum) \
             if cis_inter_on else 0
         ff_sig = gc_outer_ligand_sum * ff_coef * ff_receptors
         reverse_sig = trans_sig + cis_sig + ff_sig
