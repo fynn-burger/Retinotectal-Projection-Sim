@@ -32,7 +32,7 @@ def run():
                        cfg.current_config.get(cfg.SHOW_FIGURES))
 
     # Increase freezed gc sensors by x -> not enough because this is not incorporated in inner and outer
-
+    """
     x = 2
     for gc in first_gcs:
         gc.ligand = x * gc.ligand
@@ -42,7 +42,7 @@ def run():
         gc.inner_ligand_current = gc.ligand * (1 - cfg.current_config.get(cfg.RHO))
         gc.inner_receptor_current = gc.receptor * (1 - cfg.current_config.get(cfg.RHO))
     vz.plot_growth_cones(first_gcs, cfg.current_config.get(cfg.SHOW_FIGURES))
-
+    """
 
 
     # specify parameters for second gcs
@@ -56,16 +56,18 @@ def run():
     simulation_2 = object_factory.build_default()
     vz.plot_growth_cones(simulation_2.growth_cones, cfg.current_config.get(cfg.SHOW_FIGURES))
     # give varying gcs a head start
+
     """
     for gc in simulation_2.growth_cones:
         old_x , old_y = gc.pos
-        # new_x = round(old_x + (gc.id + 1) / 10) # give temporals a headstart
+        new_x = round(old_x + (gc.id + 1) / 5) # give temporals a headstart
         # new_x = 25 # start all at border
-        new_x = round(old_x + (99 - gc.id) / 50) + 25 # start at border but nasals have head start
+        #new_x = round(old_x + (99 - gc.id) / 50) + 25 # start at border but nasals have head start
         gc.pos = (new_x, old_y)
     # vz.plot_results_on_substrate() -> work on visualization
     """
-    gcs = first_gcs + simulation_2.growth_cones # for expansion! -> what did I meand by that
+
+    gcs = first_gcs + simulation_2.growth_cones
     simulation_2.growth_cones = gcs
     # change GC_SCOPE after building simulation such that visualization shows a full tectum -> only for expansion!
     # cfg.current_config[cfg.GC_SCOPE] = "full"
@@ -75,6 +77,7 @@ def run():
     vz.plot_adaptation_metrics(simulation_2.growth_cones, cfg.current_config.get(cfg.SHOW_FIGURES))
     vz.plot_receptor_adaptation(simulation_2.growth_cones, cfg.current_config.get(cfg.SHOW_FIGURES))
     utils.write_config_to_text(folder_path)
+
 
 if __name__ == '__main__':
     run()

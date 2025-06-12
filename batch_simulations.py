@@ -14,7 +14,14 @@ from experiments.two_phase import two_phase_experiments
 
 # --- Define parameters you want to test ---
 SWEEPS = {
-    cfg.SUBSTRATE_TYPE: [cfg.GAP]
+    cfg.SUBSTRATE_TYPE: [cfg.GAP],
+    cfg.GAP_FIRST_BLOCK_CONC: [0,4],
+    cfg.GAP_SECOND_BLOCK_CONC: [4],
+    cfg. X_STEP_POSSIBILITY: [0.65],
+    #cfg.ADAPTATION_ENABLED: [False],
+    cfg.ADAPTATION_LAMBDA: [0.0045],
+    cfg.ADAPTATION_MU: [0.006],
+    cfg.ADAPTATION_HISTORY: [250]
 }
 
 # --- Define specific combination of parameters you want to exclusively test
@@ -30,7 +37,7 @@ def run_batch(sim_module: object) -> None:
     """
 
     # --- Type in folder name for results
-    cfg.current_config[cfg.FOLDER_PATH] = "Test_new_documentaion"
+    cfg.current_config[cfg.FOLDER_PATH] = "Test old adaptation formula mirrored on yaxis"
 
     base = cfg.current_config.copy()
     keys, values = zip(*SWEEPS.items())
@@ -52,4 +59,4 @@ def run_batch(sim_module: object) -> None:
 
 if __name__ == '__main__':
     with PreventSleep():
-        run_batch(two_phase_experiments)  # at the moment either two_phase_experiments or main
+        run_batch(main)  # at the moment either two_phase_experiments or main

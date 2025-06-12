@@ -84,8 +84,8 @@ class GrowthCone:
             recent_history = self.history.potential[-h:]  # Get the last h elements from the history
 
             # Calculate the adaptation coefficient using the formula from the paper
-            '''
-            adap_co_temp = 1 + math.log(
+
+            adap_co_temp = 1 - math.log(
                 1 + mu * sum(k * abs(potential_diff) for k, potential_diff in enumerate(recent_history, 1)) / sum(
                     range(1, h + 1)))
             '''
@@ -94,8 +94,10 @@ class GrowthCone:
             adap_co_temp = math.exp(
                            - mu * sum(k * abs(potential_diff) for k, potential_diff in enumerate(recent_history, 1)) /
                            sum(range(1, h + 1)))
+            '''
 
             self.adap_co = float("{:.6f}".format(adap_co_temp))
+
 
             # Calculate the resetting force
             '''

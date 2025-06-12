@@ -371,16 +371,16 @@ def get_default_config(substrate_type):
 
 custom_config = {
     # GC Parameters
-    GC_COUNT: 20,
+    GC_COUNT: 12,
     GC_GAUSS_DECAY: 0.5,
     GC_GAUSS_THRESHOLD: 0.01,
-    GC_R_DECAY: 0.15,
-    GC_L_DECAY: 0.15,
+    GC_R_DECAY: 0.05,
+    GC_L_DECAY: 0.05,
     GC_R_FACTOR: 1,
     GC_L_FACTOR: 1,
     GC_R_SHIFT: 0,
     GC_L_SHIFT: 0,
-    RHO: 0.7,  #0.7
+    RHO: 1,  #0.7
     GC_SCOPE: "full",
 
     # Interaction Toggles
@@ -391,20 +391,20 @@ custom_config = {
     CIS_INTER: True,
 
     # Interaction Parameters
-    SIGMOID_STEEPNESS: 4,
+    SIGMOID_STEEPNESS: 5,
     SIGMOID_SHIFT: 1.75,
-    SIGMOID_HEIGHT: 3000,
+    SIGMOID_HEIGHT: 1,
 
     # Adaptation
     ADAPTATION_ENABLED: True,
-    ADAPTATION_MU: 0.01,
+    ADAPTATION_MU: 0.09,
     ADAPTATION_LAMBDA: 0.002,
     ADAPTATION_HISTORY: 10,
 
     # Step Parameters
     STEP_SIZE: 1,
     STEP_NUM: 5000,
-    X_STEP_POSSIBILITY: 0.55,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
+    X_STEP_POSSIBILITY: 0.50,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
     Y_STEP_POSSIBILITY: 0.50,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
     SIGMA: 0.08,
     FORCE: False,
@@ -416,15 +416,15 @@ custom_config = {
     SHOW_FIGURES: False,
 
     # Substrate Basics
-    SUBSTRATE_TYPE: GAP_INV,
+    SUBSTRATE_TYPE: GAP,
     ROWS: 8,
-    COLS: 50,
+    COLS: 200,
 
     # Continuous substrate values
-    CONT_GRAD_R_DECAY: 0.15,
-    CONT_GRAD_L_DECAY: 0.15,
-    CONT_GRAD_R_FACTOR: 3,
-    CONT_GRAD_L_FACTOR: 3,
+    CONT_GRAD_R_DECAY: 0.05,
+    CONT_GRAD_L_DECAY: 0.05,
+    CONT_GRAD_R_FACTOR: 1,
+    CONT_GRAD_L_FACTOR: 1,
     CONT_GRAD_R_SHIFT: 0,
     CONT_GRAD_L_SHIFT: 0,
     SUBSTRATE_SCOPE: "full",
@@ -438,11 +438,11 @@ custom_config = {
 
     # Gap substrate Values
     GAP_BEGIN: 0.4,
-    GAP_END: 0.4,
+    GAP_END: 0.1,
     GAP_FIRST_BLOCK: RECEPTOR,
     GAP_SECOND_BLOCK: RECEPTOR,
-    GAP_FIRST_BLOCK_CONC: 1.5,
-    GAP_SECOND_BLOCK_CONC: 1.5
+    GAP_FIRST_BLOCK_CONC: 4,
+    GAP_SECOND_BLOCK_CONC: 4
 }
 
 """
