@@ -156,6 +156,8 @@ class Simulation:
         random_number = random.random()
         if random_number > probability:
             gc.take_step(pos_new, potential_new)
+        else:
+            gc.take_step(gc.pos, gc.potential)
 
     def gen_random_step(self, gc):
         """

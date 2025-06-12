@@ -1,26 +1,19 @@
-# batch.py
+"""
+Batch-run simulation experiments with parameter sweeps.
+
+This script will iterate over all SWEEPS combos (or only SELECTED_COMBOS,
+if non-empty), set cfg.current_config appropriately, and call sim_module.run().
+"""
+
 import itertools
-import subprocess
 
 from build import config as cfg
-import main  # assumes main.py has a run() function
+from helpers.prevent_sleep_mac import PreventSleep
+import main
 from experiments.two_phase import two_phase_experiments
 
-subprocess.run([
-    "osascript",
-    "-e",
-    'tell application "Amphetamine" to enable closed display mode'
-])  # :contentReference[oaicite:0]{index=0}
-
-subprocess.run([
-    "osascript",
-    "-e",
-    'tell application "Amphetamine" to start new session with options {displaySleepAllowed:false}'
-])  # :contentReference[oaicite:0]{index=0}
-
-cfg.current_config[cfg.FOLDER_PATH] = ("Knock_In") # what name should your folder have
-# 1) define your sweep
-sweeps = {
+# --- Define parameters you want to test ---
+SWEEPS = {
     cfg.SUBSTRATE_TYPE: [cfg.GAP],
     cfg.CONT_GRAD_R_DECAY: [0.03],
     cfg.CONT_GRAD_L_DECAY: [0.03],
@@ -30,39 +23,39 @@ sweeps = {
     cfg.FF_INTER: [False]
 }
 
-
-# 2) cache your “base” config
-base = cfg.current_config.copy()
-keys, values = zip(*sweeps.items())
-
-
-selected_combos = [
+# --- Define specific combination of parameters you want to exclusively test
+SELECTED_COMBOS = [
 ]
 
 
-for combo in itertools.product(*values):
-    if selected_combos and combo not in selected_combos:
-        continue
-    # 3) reset to base, then apply this combination
-    cfg.current_config = base.copy()
-    for k, v in zip(keys, combo):
-        cfg.current_config[k] = v
+def run_batch(sim_module: object) -> None:
+    """Run multiple simulations with different parameters in one batch.
 
-    # 4) build a unique folder-name tag
-    combo_tag = "__".join(
-        f"{k.split('_')[-1]}={v}" for k, v in zip(keys, combo)
-    )
-    # store folder name in config
-    cfg.current_config[cfg.FOLDER_NAME] = combo_tag
+    Args:
+        sim_module: Module with a .run() function.
+    """
 
-    # 5) run it
-    main.run()
-    # two_phase_experiments.run()
+    # --- Type in folder name for results
+    cfg.current_config[cfg.FOLDER_PATH] = "Tests after carrying over from expon"
+
+    base = cfg.current_config.copy()
+    keys, values = zip(*SWEEPS.items())
+
+    for combo in itertools.product(*values):
+        if combo not in SELECTED_COMBOS and len(SELECTED_COMBOS) != 0:
+            continue
+        cfg.current_config = base.copy()
+        for k, v in zip(keys, combo):
+            cfg.current_config[k] = v
+
+        combo_tag = "__".join(
+            f"{k.split('_')[-1]}={v}" for k, v in zip(keys, combo)
+        )
+        cfg.current_config[cfg.FOLDER_NAME] = combo_tag
+
+        sim_module.run()
 
 
-# 3) Beende die Amphetamine-Session
-subprocess.run([
-    "osascript",
-    "-e",
-    'tell application "Amphetamine" to end session'
-])  # :contentReference[oaicite:1]{index=1}
+if __name__ == '__main__':
+    with PreventSleep():
+        run_batch(main)  # at the moment either two_phase_experiments or main

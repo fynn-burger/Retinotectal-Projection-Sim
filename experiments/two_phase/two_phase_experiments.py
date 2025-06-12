@@ -3,7 +3,8 @@ from build import object_factory
 from visualization import utils as vz
 from build import utils
 
-def two_phase_run():
+
+def run():
     """
     Polarity reversal experiment with two nasal populations as waves that grow onto substrate in sequential order.
     :return:
@@ -69,7 +70,7 @@ def two_phase_run():
     # vz.plot_results_on_substrate() -> work on visualization
     """
 
-    gcs = first_gcs + simulation_2.growth_cones # for expansion! -> what did I meand by that
+    gcs = first_gcs + simulation_2.growth_cones
     simulation_2.growth_cones = gcs
     # change GC_SCOPE after building simulation such that visualization shows a full tectum -> only for expansion!
     cfg.current_config[cfg.GC_SCOPE] = "full"
@@ -79,10 +80,6 @@ def two_phase_run():
     vz.plot_adaptation_metrics(simulation_2.growth_cones, cfg.current_config.get(cfg.SHOW_FIGURES))
     vz.plot_receptor_adaptation(simulation_2.growth_cones, cfg.current_config.get(cfg.SHOW_FIGURES))
     utils.write_config_to_text(folder_path)
-
-
-def run():
-    two_phase_run()
 
 
 if __name__ == '__main__':
