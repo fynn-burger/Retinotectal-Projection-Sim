@@ -145,6 +145,7 @@ def initialize_growth_cones(config):
     gc_l_shift = config.get(cfg.GC_L_SHIFT)
     gc_r_decay = config.get(cfg.GC_R_DECAY)
     gc_l_decay = config.get(cfg.GC_L_DECAY)
+    knock_in = config.get(cfg.KNOCK_IN)
     fsfac = 50/cols # factor to normalize gradient to match a col-number of 50
 
     x_positions = np.linspace(1, cols, gc_count)
@@ -169,7 +170,7 @@ def initialize_growth_cones(config):
     for i in range(gc_count):
         # Create a GrowthCone instance and initialize it
         pos_y = y_positions[i]
-        gc = GrowthCone((size, pos_y), size, ligands[i], receptors[i], i, rho)
+        gc = GrowthCone((size, pos_y), size, ligands[i], receptors[i], i, rho, knock_in)
         growth_cones.append(gc)
 
     if cfg.current_config.get(cfg.GC_SCOPE) != "full":

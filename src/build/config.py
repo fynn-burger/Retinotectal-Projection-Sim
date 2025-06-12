@@ -36,6 +36,7 @@ GC_R_FACTOR = "gc_r_factor"
 GC_L_FACTOR = "gc_l_factor"
 GC_R_SHIFT = "gc_r_sift"
 GC_L_SHIFT = "gc_l_sift"
+KNOCK_IN = "knock_in"
 RHO = "rho"
 GC_SCOPE = "gc_scope"
 
@@ -203,6 +204,7 @@ default_configs = {
         GC_L_FACTOR: 1,
         GC_R_SHIFT: 0,
         GC_L_SHIFT: 0,
+        KNOCK_IN: 0,
         RHO: 1,
         GC_SCOPE: "full",
         X_STEP_POSSIBILITY: 0.55,
@@ -246,6 +248,7 @@ default_configs = {
         GC_L_FACTOR: 1,
         GC_R_SHIFT: 0,
         GC_L_SHIFT: 0,
+        KNOCK_IN: 0,
         RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
@@ -281,6 +284,7 @@ default_configs = {
         GC_L_FACTOR: 1,
         GC_R_SHIFT: 0,
         GC_L_SHIFT: 0,
+        KNOCK_IN: 0,
         RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
@@ -319,6 +323,7 @@ default_configs = {
         GC_L_FACTOR: 1,
         GC_R_SHIFT: 0,
         GC_L_SHIFT: 0,
+        KNOCK_IN: 0,
         RHO: 1,
         X_STEP_POSSIBILITY: 0.55,
         Y_STEP_POSSIBILITY: 0.50,
@@ -373,6 +378,7 @@ custom_config = {
     GC_L_FACTOR: 1,
     GC_R_SHIFT: 0,
     GC_L_SHIFT: 0,
+    KNOCK_IN: 0,
     RHO: 1,  #0.7
     GC_SCOPE: "full",
 
