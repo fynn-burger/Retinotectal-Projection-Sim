@@ -18,15 +18,16 @@ class GrowthCone:
         potential (float): Current potential of the growth cone.
     """
 
-    def __init__(self, position, size, ligand, receptor, id, rho, freeze=False, marked=False):
+    def __init__(self, position, size, ligand, receptor, id, rho, knock_in=0, freeze=False, marked=False):
         self.pos = position
         self.radius = size
+        self.id = id
         '''
         self.ligand_current = ligand
         self.receptor_current = receptor
         '''
-        self.ligand = ligand
-        self.receptor = receptor
+        self.receptor = self.set_receptor(receptor, knock_in)
+        self.ligand = self.set_ligand(ligand, knock_in)
         self.outer_ligand_current = self.ligand * rho
         self.outer_receptor_current = self.receptor * rho
         self.inner_ligand_current = self.ligand * (1 - rho)
@@ -40,7 +41,6 @@ class GrowthCone:
         self.reset_force_ligand = 0
         '''
         self.reset_force = 0
-        self.id = id
         self.rho_current = rho
         self.freeze = freeze  # needed for polarity reversal
         self.marked = marked  # needed to visualize two sets of GCs like in knock-in
@@ -60,6 +60,20 @@ class GrowthCone:
                 f"Position: {self.pos}, "f"Start Position: {self.get_start_pos()}, Potential: {self.potential}, "
                 f"ID: {self.id}, Adaptation Coefficient: {self.adap_co}, "
                 f"Reset Force: {self.reset_force}")
+
+    def set_receptor(self, receptor, knock_in):
+        if self.id % 2 == 0:
+            receptor_new = receptor + knock_in
+        else:
+            receptor_new = receptor
+        return receptor_new
+
+    def set_ligand(self, ligand, knock_in):
+        if self.id % 2 == 0:
+            ligand_new = 1/self.receptor
+        else:
+            ligand_new = ligand
+        return ligand_new
 
     def take_step(self, pos_new, potential_new):
         """
