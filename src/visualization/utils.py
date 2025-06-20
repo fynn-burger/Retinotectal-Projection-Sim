@@ -2,7 +2,6 @@ import os
 from visualization import visualizations as vz
 from build import config as cfg
 
-
 def save_and_show(fig, path: str, show: bool = True):
     """Save figure to disk and optionally display it."""
     base, ext = os.path.splitext(path)
@@ -42,10 +41,12 @@ def plot_substrate_separate(substrate, show: bool = True):
 
 def plot_projection(result, substrate, cones, show: bool = True, fit_type: str = "linear", current_step: int = 0):
     # choose filename based on fit type
-    filename = "projection.png" if fit_type == "linear" else f"projection_{fit_type}.png"
+    filename = "projection.png"
     if current_step in cfg.current_config.get(cfg.INTERIM_RESULTS):
         filename = f"projection_step{current_step}.png"
     path = os.path.join(cfg.current_config.get(cfg.FOLDER_PATH), filename)
+    if result.config["knock_in"] != 0:
+        fit_type = "polyfit"
     fig = vz.visualize_projection(
         result,
         substrate,
@@ -72,9 +73,9 @@ def plot_trajectories_on_substrate(result, substrate, cones, show: bool = True):
     return fig
 
 
-def plot_trajectories(cones, show: bool = True):
+def plot_trajectories(result, cones, show: bool = True):
     path = os.path.join(cfg.current_config.get(cfg.FOLDER_PATH), "trajectories.png")
-    fig = vz.visualize_trajectories(cones)
+    fig = vz.visualize_trajectories(result, cones)
     save_and_show(fig, path, show)
     return fig
 
@@ -93,3 +94,17 @@ def plot_receptor_adaptation(cones, show: bool = True):
     save_and_show(fig_outer, outer_path, show)
     save_and_show(fig_inner, inner_path, show)
     return fig_outer, fig_inner
+
+def visualize_start_values(simulation, show):
+    plot_growth_cones(simulation.growth_cones, show=show)
+    plot_substrate(simulation.substrate, show=show)
+    plot_substrate_separate(simulation.substrate, show=show)
+
+
+def visualize_results(result, simulation, show):
+    plot_projection(result, simulation.substrate, simulation.growth_cones, show=show)
+    plot_results_on_substrate(result, simulation.substrate, show=show)
+    plot_trajectories_on_substrate(result, simulation.substrate, simulation.growth_cones, show=show)
+    plot_trajectories(result, simulation.growth_cones, show=show)
+    plot_adaptation_metrics(simulation.growth_cones, show=show)
+    plot_receptor_adaptation(simulation.growth_cones, show=show)

@@ -46,19 +46,32 @@ def visualize_image(image, title, rect=None):
     return fig
 
 
-def visualize_data_points(x, y, x_label, y_label, title, growth_cones=None, **kwargs):
+def visualize_data_points(x, y, x_label, y_label, title, mutated_idx, growth_cones=None, **kwargs):
     fig, ax = plt.subplots(figsize=(10, 10))
     if growth_cones is not None:
         # Identify indices
         frozen_idx = [i for i, gc in enumerate(growth_cones) if getattr(gc, 'freeze', False)]
         active_idx = [i for i in range(len(growth_cones)) if i not in frozen_idx]
+        mutated_idx = mutated_idx if mutated_idx else []
+        wildtype_idx = [i for i in range(len(growth_cones)) if i not in mutated_idx]
         # Active cones
+        # Wildtype cones
         ax.plot(
-            [x[i] for i in active_idx],
-            [y[i] for i in active_idx],
+            [x[i] for i in wildtype_idx if i in active_idx],
+            [y[i] for i in wildtype_idx if i in active_idx],
             '*',
-            label='active'
+            color='red',
+            label='wildtype' if mutated_idx else 'active',
         )
+        # Mutated cones
+        if mutated_idx:
+            ax.plot(
+                [x[i] for i in mutated_idx if i in active_idx],
+                [y[i] for i in mutated_idx if i in active_idx],
+                '*',
+                color='blue',
+                label='mutated'
+            )
         # Frozen cones
         if frozen_idx:
             ax.plot(
@@ -131,23 +144,68 @@ def visualize_results_on_substrate(result, substrate):
 
 
 def visualize_projection(result, substrate, fit_type="linear", gc_scope="full", substrate_scope="full"
-                         , mutated_indexes=None, growth_cones=None):
+                         , growth_cones=None):
     # get values
     ap_values, nt_values = result.get_projection_id()
     # normalize values
     ap_values_normalized = normalize_mapping(ap_values, substrate.offset, substrate.cols - substrate.offset - 1)
     nt_values_normalized = normalize_mapping(nt_values, nt_values[0], nt_values[-1])
 
+    mutated_idx = []
+    if result.config["knock_in"] != 0:
+        mutated_idx = [i for i in range(len(growth_cones)) if i % 2 == 0]
+        wildtype_idx = [i for i in range(len(growth_cones)) if i not in mutated_idx]
+        ap_values_knock_in = ap_values_normalized[mutated_idx]
+        nt_values_knock_in = nt_values_normalized[mutated_idx]
+        ap_values_wildtype = ap_values_normalized[wildtype_idx]
+        nt_values_wildtype = nt_values_normalized[wildtype_idx]
+
     # create figure
     fig = visualize_data_points(nt_values_normalized, ap_values_normalized,
                                 "% n-t Axis of Retina","% a-p Axis of Target", "Projection Mapping",
-                                growth_cones=growth_cones)
+                                mutated_idx, growth_cones=growth_cones)
     # calculate regression
     try:
         if fit_type == "linear":
-            add_linear_regression(nt_values_normalized, ap_values_normalized)
+            if mutated_idx:
+                add_linear_regression(nt_values_knock_in, ap_values_knock_in, knock_in=True)
+                add_linear_regression(nt_values_wildtype, ap_values_wildtype)
+            else:
+                add_linear_regression(nt_values_normalized, ap_values_normalized)
         elif fit_type == "polyfit":
-            add_polynomial_fit(nt_values_normalized, ap_values_normalized, mutated_indexes)
+            if mutated_idx:
+                # 1) do your two fits and get back poly objects
+                poly_knock = add_polynomial_fit(nt_values_knock_in, ap_values_knock_in, knock_in=True)
+                poly_wt = add_polynomial_fit(nt_values_wildtype, ap_values_wildtype, knock_in=False)
+
+                # 2) compute residuals at the original data points
+                res_kn = ap_values_knock_in - poly_knock(nt_values_knock_in)
+                res_wt = ap_values_wildtype - poly_wt(nt_values_wildtype)
+
+                # 3) compute RMSE for each
+                rmse_kn = np.sqrt(np.mean(res_kn ** 2))
+                rmse_wt = np.sqrt(np.mean(res_wt ** 2))
+
+                # 4) combine into a single tolerance, e.g. quadrature
+                eps = np.sqrt(rmse_kn ** 2 + rmse_wt ** 2)
+
+                # 5) find the merge‐zone on a fine grid
+                a, b = min(min(nt_values_knock_in), min(nt_values_wildtype)), max(max(nt_values_knock_in), max(nt_values_wildtype))
+                xs = np.linspace(a, b, 2000)
+                deltas = np.abs(poly_wt(xs) - poly_knock(xs))
+
+                mask = deltas <= eps
+                if mask.any():
+                    x0, x1 = xs[mask][[0, -1]]
+                    mid = 0.5 * (x0 + x1)
+                    ymid = poly_wt(mid)
+
+                    # shade the zone and mark the midpoint
+                    label_text = f"Zone ab x={x0:.2f} (Δ≤{eps:.2f})"
+
+                    plt.axvspan(x0, x1, color='gray', alpha=0.2, label=label_text)
+            else:
+                add_polynomial_fit(nt_values_normalized, ap_values_normalized)
     except ValueError as e:
         print("could not calculate linear regression")
 
@@ -158,7 +216,7 @@ def visualize_projection(result, substrate, fit_type="linear", gc_scope="full", 
     return fig
 
 
-def add_linear_regression(x, y):
+def add_linear_regression(x, y, knock_in=False):
     try:
         slope, intercept, r_value, *_ = linregress(x, y)
         regression_line = slope * x + intercept
@@ -166,7 +224,7 @@ def add_linear_regression(x, y):
         null_point_x = -intercept / slope if slope != 0 else None
 
         # Plot the regression line
-        plt.plot(x, regression_line, 'r-',
+        plt.plot(x, regression_line, color='red' if knock_in is False else 'blue',
                  label=f'Linear Regression\nSlope: {slope:.2f}\n'
                        f'R²: {correlation:.2f}\nNull Point X: {null_point_x:.2f}\nNull Point Y: {intercept:.2f}')
 
@@ -174,21 +232,48 @@ def add_linear_regression(x, y):
         print ("could not calculate linear regression", e)
 
 
-def add_polynomial_fit(x, y, mutated_indexes):
+def add_polynomial_fit(x, y, knock_in=False):
     coeffs = np.polyfit(x, y, 3)
     poly = np.poly1d(coeffs)
-    plt.plot(x, poly(x), 'b-', label="Cubic Fit")
+    plt.plot(x, poly(x), color='red' if knock_in is False else 'blue', label="Cubic Fit")
+    return poly
 
 
-def visualize_trajectories(growth_cones, trajectory_freq=50):
-    fig, ax = plt.subplots(figsize=(10, 10))
+def visualize_trajectories(result, growth_cones, trajectory_freq=50):
+    # Start from a blank figure (no blended background)
+    fig, ax = plt.subplots()
+    ax.set_xlim(0, result.config["cols"] + 2*result.config["gc_size"])
+    ax.set_ylim(0, result.config["rows"] + 2*result.config["gc_size"])
+
+    # Plot the final end‐positions as larger stars
+    x_values, y_values = result.get_final_positioning()
+    ax.plot(
+        x_values,
+        y_values,
+        marker='*',
+        linestyle='',
+        markersize=12,
+        color='red',
+        zorder=10,
+        label='Tectum End‐positions'
+    )
+
+    # Plot every trajectory in the same color
     for idx, gc in enumerate(growth_cones):
         trajectory_x, trajectory_y = zip(*gc.history.position[::trajectory_freq])
-        ax.plot(trajectory_x, trajectory_y, label=f'Growth Cone {idx}')
-    ax.set_title('Growth Cone Trajectories')
-    # ax.legend()
-    plt.xlabel("n-t Axis of Retina")
-    plt.ylabel("d-v Axis of Retina")
+        ax.plot(
+            trajectory_x,
+            trajectory_y,
+            linestyle='-',
+            linewidth=1,
+            color='red',
+            label=f'Growth Cone {idx}'
+        )
+
+    # Remove axis ticks and frame
+    ax.set_xticks([])
+    ax.set_yticks([])
+
     return fig
 
 
