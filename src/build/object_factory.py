@@ -150,18 +150,13 @@ def initialize_growth_cones(config):
 
     x_positions = np.linspace(1, cols, gc_count)
     center = (cols + 1) / 2
-    # linear gradient
-    """
-    ligands_1 = np.linspace(0.294, 3.4, len(x_positions))
-    receptors_1 = np.linspace(3.4, 0.294, len(x_positions))
-    receptors = np.linspace(receptors_1[int(len(receptors_1)*3/4)], receptors_1[int(len(receptors_1)*3/4)], len(x_positions))
-    ligands = np.linspace(ligands_1[int(len(ligands_1)*3/4)], ligands_1[int(len(ligands_1)*3/4)], len(x_positions))
-    """
+
     receptors = []
     ligands = []
     for position in x_positions:
-        receptors.append(gc_r_factor * np.exp(fsfac * gc_r_decay * (position + gc_r_shift - center)))
-        ligands.append(gc_l_factor * np.exp(-gc_l_decay * fsfac * (position + gc_l_shift - center)))
+        receptors.append(gc_r_factor * np.exp(gc_r_decay * (fsfac * (position - center) + gc_r_shift)))
+        ligands.append(gc_l_factor * np.exp(-gc_l_decay * (fsfac * (position - center) + gc_l_shift )))
+
 
 
     # Create an array of evenly distributed y-positions for the growth cones
