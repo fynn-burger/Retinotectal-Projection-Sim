@@ -1,3 +1,15 @@
+"""
+Utilities for creating result directories and exporting configurations
+for Retinotectal Projection simulations.
+
+This module provides two main functions:
+
+- create_simulation_folder(): Creates a timestamped, branch-specific results folder and updates
+                              cfg.current_config with its path.
+
+- write_config_to_text(folder_path): Writes the key/value pairs from cfg.current_config into a 'config.txt'.
+"""
+
 import os
 import build.config as cfg
 import datetime
@@ -5,6 +17,27 @@ import subprocess
 
 
 def create_simulation_folder():
+    """
+    Create a structured results directory for the current simulation run.
+
+    The resulting path has the form:
+      <repo_root>/../Retinotectal_Results/<git_branch>/<cfg.FOLDER_PATH>/<cfg.FOLDER_NAME or timestamp>/
+
+    Steps:
+    1. Determine repository root (three levels up from this file -> One level above the repo).
+    2. Append 'Retinotectal_Results' and current Git branch name.
+    3. Incorporate user-specified subpath from cfg.current_config[FOLDER_PATH].
+    4. Use cfg.current_config[FOLDER_NAME] or generate a timestamp.
+    5. Create the directory (exist_ok=True).
+    6. Update cfg.current_config[FOLDER_PATH] to the new absolute path.
+
+    Returns:
+        str: Absolute path to the newly created results folder.
+
+    Raises:
+        subprocess.CalledProcessError: If the Git command fails.
+    """
+    # Create path outside of repository
     basedir = os.path.abspath(
         os.path.join(
             os.path.dirname(__file__),
@@ -15,6 +48,7 @@ def create_simulation_folder():
     )
     results_dir = os.path.join(basedir, "Retinotectal_Results")
 
+    # Read current branch name
     branch = (
         subprocess
         .check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
@@ -22,14 +56,14 @@ def create_simulation_folder():
         .decode("utf-8")
     )
 
-    # 5) Branch-spezifischer Ordner in Results
+    # Add branch-specific name to path
     results_dir = os.path.join(results_dir, branch)
 
-
-    # Bereits in der Konfiguration hinterlegten Pfad (relativ) einfügen
+    # Add in config specified folder path to path
     existing_subpath = cfg.current_config.get(cfg.FOLDER_PATH, "")
     target_base = os.path.join(results_dir, existing_subpath)
 
+    # If no folder name is specified in config use a timestamp
     if cfg.current_config[cfg.FOLDER_NAME] != "":
         folder_name = cfg.current_config[cfg.FOLDER_NAME]
     else:
@@ -42,6 +76,16 @@ def create_simulation_folder():
 
 
 def write_config_to_text(folder_path):
+    """
+    Write the current configuration to a 'config.txt' file in the specified folder.
+
+    Each line in the file has the format:
+        key: value
+
+    Args:
+        folder_path (str): Path to the folder where 'config.txt' will be created.
+    """
+
     file_path = os.path.join(folder_path, "config.txt")
     with open(file_path, 'w') as f:
         for key, value in cfg.current_config.items():
