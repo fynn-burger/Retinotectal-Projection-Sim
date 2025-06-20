@@ -35,6 +35,8 @@ def build_simulation(config) -> Simulation:
     sigmoid_steepness = config.get(cfg.SIGMOID_STEEPNESS)
     sigmoid_shift = config.get(cfg.SIGMOID_SHIFT)
     sigmoid_height = config.get(cfg.SIGMOID_HEIGHT)
+    cis_in_fac = config.get(cfg.CIS_IN_FAC)
+    cis_out_fac = config.get(cfg.CIS_OUT_FAC)
     sigma = config.get(cfg.SIGMA)
     force = config.get(cfg.FORCE)
     forward_sig = config.get(cfg.FORWARD_SIG)
@@ -59,8 +61,9 @@ def build_simulation(config) -> Simulation:
 
     # Initialize the Simulation object with the new parameters
     simulation = Simulation(config, substrate, growth_cones, adaptation, step_size, num_steps, x_step_p, y_step_p,
-                            sigmoid_steepness, sigmoid_shift, sigmoid_height, sigma, force, forward_sig, reverse_sig, ff_inter,
-                            ft_inter, cis_inter, mu, lambda_, history_length, interim_results, gc_scope, substrate_scope)
+                            sigmoid_steepness, sigmoid_shift, sigmoid_height, cis_in_fac, cis_out_fac,
+                            sigma, force, forward_sig, reverse_sig, ff_inter, ft_inter, cis_inter, mu, lambda_,
+                            history_length, interim_results, gc_scope, substrate_scope)
     return simulation
 
 
@@ -157,11 +160,14 @@ def initialize_growth_cones(config):
         receptors.append(gc_r_factor * np.exp(gc_r_decay * (fsfac * (position - center) + gc_r_shift)))
         ligands.append(gc_l_factor * np.exp(-gc_l_decay * (fsfac * (position - center) + gc_l_shift )))
 
+
+    """
     receptor_value = receptors[int(gc_count * 0.25)]
     ligand_value = ligands[int(gc_count * 0.25)]
 
     receptors = [receptor_value] * len(receptors)
     ligands = [ligand_value] * len(ligands)
+    """
 
 
     # Create an array of evenly distributed y-positions for the growth cones

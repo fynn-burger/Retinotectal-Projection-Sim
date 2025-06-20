@@ -20,6 +20,8 @@ Y_STEP_POSSIBILITY = "y_step_possibility"
 SIGMOID_STEEPNESS = "sigmoid_steepness"
 SIGMOID_SHIFT = "sigmoid_shift"
 SIGMOID_HEIGHT = "sigmoid_height"
+CIS_IN_FAC = "cis_in_fac"
+CIS_OUT_FAC = "cis_out_fac"
 SIGMA = "sigma"
 FORCE = "force"
 FORWARD_SIG = "forward_sig"
@@ -110,6 +112,8 @@ simulation_advanced = {
     SIGMOID_STEEPNESS: 4,
     SIGMOID_SHIFT: 3,
     SIGMOID_HEIGHT: 1,
+    CIS_IN_FAC: 10,
+    CIS_OUT_FAC: 0.1,
     SIGMA: 0.06,
     FORCE: False,
     FORWARD_SIG: True,
@@ -212,6 +216,8 @@ default_configs = {
         SIGMOID_STEEPNESS: 4,
         SIGMOID_SHIFT: 3,
         SIGMOID_HEIGHT: 1,
+        CIS_IN_FAC: 10,
+        CIS_OUT_FAC: 0.1,
         SIGMA: 0.06,
         FORCE: False,
         FORWARD_SIG: True,
@@ -255,6 +261,8 @@ default_configs = {
         SIGMOID_STEEPNESS: 4,
         SIGMOID_SHIFT: 3,
         SIGMOID_HEIGHT: 1,
+        CIS_IN_FAC: 10,
+        CIS_OUT_FAC: 0.1,
         SIGMA: 0.06,
         FORCE: False,
         FORWARD_SIG: True,
@@ -291,6 +299,8 @@ default_configs = {
         SIGMOID_STEEPNESS: 4,
         SIGMOID_SHIFT: 3,
         SIGMOID_HEIGHT: 1,
+        CIS_IN_FAC: 10,
+        CIS_OUT_FAC: 0.1,
         SIGMA: 0.06,
         FORCE: False,
         FORWARD_SIG: True,
@@ -330,6 +340,8 @@ default_configs = {
         SIGMOID_STEEPNESS: 4,
         SIGMOID_SHIFT: 3,
         SIGMOID_HEIGHT: 1,
+        CIS_IN_FAC: 10,
+        CIS_OUT_FAC: 0.1,
         SIGMA: 0.06,
         FORCE: False,
         FORWARD_SIG: True,
@@ -370,10 +382,10 @@ def get_default_config(substrate_type):
 
 custom_config = {
     # GC Parameters
-    GC_COUNT: 15,
+    GC_COUNT: 200,
     GC_SIZE: 2,
-    GC_R_DECAY: 0.05,
-    GC_L_DECAY: 0.05,
+    GC_R_DECAY: 0.03,
+    GC_L_DECAY: 0.03,
     GC_R_FACTOR: 1,
     GC_L_FACTOR: 1,
     GC_R_SHIFT: 0,
@@ -392,17 +404,19 @@ custom_config = {
     # Interaction Parameters
     SIGMOID_STEEPNESS: 5,
     SIGMOID_SHIFT: 1.75,
-    SIGMOID_HEIGHT: 7000,
+    SIGMOID_HEIGHT: 100,
+    CIS_IN_FAC: 10,
+    CIS_OUT_FAC: 0.1,
 
     # Adaptation
     ADAPTATION_ENABLED: True,
-    ADAPTATION_MU: 0.2,
+    ADAPTATION_MU: 0.005,
     ADAPTATION_LAMBDA: 0.001,
     ADAPTATION_HISTORY: 10,
 
     # Step Parameters
     STEP_SIZE: 1,
-    STEP_NUM: 5000,
+    STEP_NUM: 8000,
     X_STEP_POSSIBILITY: 0.50,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
     Y_STEP_POSSIBILITY: 0.50,  # hier muss klarer sein, dass die beiden probabilities unterschiedliche Dinge tun
     SIGMA: 0.12,
@@ -417,13 +431,13 @@ custom_config = {
     # Substrate Basics
     SUBSTRATE_TYPE: CONTINUOUS_GRADIENTS,
     ROWS: 8,
-    COLS: 200,
+    COLS: 50,
 
     # Continuous substrate values
-    CONT_GRAD_R_DECAY: 0.05,
-    CONT_GRAD_L_DECAY: 0.05,
-    CONT_GRAD_R_FACTOR: 25,
-    CONT_GRAD_L_FACTOR: 25,
+    CONT_GRAD_R_DECAY: 0.03,
+    CONT_GRAD_L_DECAY: 0.03,
+    CONT_GRAD_R_FACTOR: 1,
+    CONT_GRAD_L_FACTOR: 1,
     CONT_GRAD_R_SHIFT: 0,
     CONT_GRAD_L_SHIFT: 0,
     SUBSTRATE_SCOPE: "full",
@@ -440,8 +454,8 @@ custom_config = {
     GAP_END: 0.05,
     GAP_FIRST_BLOCK: RECEPTOR,
     GAP_SECOND_BLOCK: RECEPTOR,
-    GAP_FIRST_BLOCK_CONC: 50,
-    GAP_SECOND_BLOCK_CONC: 50
+    GAP_FIRST_BLOCK_CONC: 1,
+    GAP_SECOND_BLOCK_CONC: 1
 }
 
 """

@@ -37,8 +37,8 @@ class Simulation:
     """
 
     def __init__(self, config, substrate, growth_cones, adaptation, step_size, num_steps, x_step_p, y_step_p, sigmoid_steepness,
-                 sigmoid_shift, sigmoid_height, sigma, force, forward_sig, reverse_sig, ff_inter, ft_inter,cis_inter, mu, lambda_,
-                 history_length, interim_results, gc_scope, substrate_scope):
+                 sigmoid_shift, sigmoid_height, cis_in_fac, cis_out_fac, sigma, force, forward_sig, reverse_sig,
+                 ff_inter, ft_inter,cis_inter, mu, lambda_, history_length, interim_results, gc_scope, substrate_scope):
         self.config = config
         self.forward_sig = forward_sig
         self.reverse_sig = reverse_sig
@@ -55,6 +55,8 @@ class Simulation:
         self.sigmoid_steepness = sigmoid_steepness
         self.sigmoid_shift = sigmoid_shift
         self.sigmoid_height = sigmoid_height
+        self.cis_in_fac = cis_in_fac
+        self.cis_out_fac = cis_out_fac
         self.sigma = sigma
         self.force = force
         self.mu = mu
@@ -87,7 +89,8 @@ class Simulation:
             # Potential initialization
             gc.potential = calculate_potential(gc, gc.pos, self.growth_cones, self.substrate, self.forward_sig,
                                                self.reverse_sig, self.ff_inter, self.ft_inter, self.cis_inter, 0,
-                                               self.num_steps, self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
+                                               self.num_steps, self.sigmoid_steepness, self.sigmoid_shift,
+                                               self.sigmoid_height, self.cis_in_fac, self.cis_out_fac)
 
             print(gc.__str__())
 
@@ -115,13 +118,15 @@ class Simulation:
             gc.potential = calculate_potential(gc, gc.pos, self.growth_cones, self.substrate,
                                                self.forward_sig, self.reverse_sig, self.ff_inter,
                                                self.ft_inter, self.cis_inter, step_current, self.num_steps,
-                                               self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
+                                               self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height,
+                                               self.cis_in_fac, self.cis_out_fac)
             # calculate potential of possible next step
             pos_new = self.gen_random_step(gc)
             potential_new = calculate_potential(gc, pos_new, self.growth_cones, self.substrate,
                                                 self.forward_sig, self.reverse_sig, self.ff_inter,
                                                 self.ft_inter, self.cis_inter, step_current, self.num_steps,
-                                                self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height)
+                                                self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height,
+                                                self.cis_in_fac, self.cis_out_fac)
             self.step_decision(gc, pos_new, potential_new)
 
     def create_interim_results(self, step_current):

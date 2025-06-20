@@ -7,7 +7,7 @@ import numpy as np
 
 
 def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inter_on, ft_inter_on, cis_inter_on,
-                        step, num_steps, sigmoid_steepness, sigmoid_shift, sigmoid_height):
+                        step, num_steps, sigmoid_steepness, sigmoid_shift, sigmoid_height, cis_in_fac, cis_out_fac):
     """
     Calculate guidance potential for a growth cone (gc) in a model.
     """
@@ -33,13 +33,15 @@ def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inte
     forward_sig = reverse_sig = 0
     if forward_on:
         trans_sig = gc_outer_receptor_sum * ft_ligands
-        cis_sig = 5 * (gc_inner_receptor_sum * gc_inner_ligand_sum) + (gc_outer_receptor_sum * gc_outer_ligand_sum) \
+        cis_sig = cis_in_fac * (gc_inner_receptor_sum * gc_inner_ligand_sum) \
+            + cis_out_fac * (gc_outer_receptor_sum * gc_outer_ligand_sum) \
             if cis_inter_on else 0
         ff_sig = gc_outer_receptor_sum * ff_coef * ff_ligands
         forward_sig = trans_sig + cis_sig + ff_sig
     if reverse_on:
         trans_sig = gc_outer_ligand_sum * ft_receptors
-        cis_sig = 5 * (gc_inner_receptor_sum * gc_inner_ligand_sum) + (gc_outer_receptor_sum * gc_outer_ligand_sum) \
+        cis_sig = cis_in_fac * (gc_inner_receptor_sum * gc_inner_ligand_sum) \
+            + cis_out_fac * (gc_outer_receptor_sum * gc_outer_ligand_sum) \
             if cis_inter_on else 0
         ff_sig = gc_outer_ligand_sum * ff_coef * ff_receptors
         reverse_sig = trans_sig + cis_sig + ff_sig
@@ -51,7 +53,6 @@ def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inte
     # Ensure signals are strictly positive
     forward_sig = max(forward_sig, 0.0001)
     reverse_sig = max(reverse_sig, 0.0001)
-
 
     # Calculate and return the potential
     return abs(math.log(reverse_sig) - math.log(forward_sig))
@@ -159,5 +160,3 @@ def intersection_area(gc1_pos, gc2_pos, radius):
         if sector < triangle:
             print(sector, triangle)
         return (sector - triangle) * 2
-
-
