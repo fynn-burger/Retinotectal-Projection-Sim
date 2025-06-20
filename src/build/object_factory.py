@@ -1,5 +1,11 @@
 """
-Module for setting up all the objects in the model.
+Module for constructing simulation environments and growth cones for the retinotectal projection model.
+
+This builder module provides:
+- `build_default()`: Create a Simulation using the current global configuration.
+- `build_simulation(config)`: Build a Simulation instance from an arbitrary config dictionary.
+- `build_substrate(config)`: Instantiate the appropriate Substrate subclass based on config.
+- `initialize_growth_cones(config)`: Create and configure a list of GrowthCone objects.
 """
 
 import numpy as np
@@ -13,14 +19,29 @@ from model.substrate import (ContinuousGradientSubstrate, WedgeSubstrate,
 
 def build_default() -> Simulation:
     """
-    Build a default model.
+    Construct a Simulation using the global `cfg.current_config` settings.
+
+    Returns:
+        Simulation: A fully initialized Simulation instance based on the current config.
     """
     return build_simulation(cfg.current_config)
 
 
 def build_simulation(config) -> Simulation:
     """
-    Build substrate object and growth cone list to then build the simulation instance.
+    Build a Simulation object from a configuration dictionary.
+
+    This function:
+    1. Builds the substrate instance.
+    2. Initializes growth cones.
+    3. Extracts simulation parameters from `config`.
+    4. Instantiates and returns a `Simulation`.
+
+    Args:
+        config (dict): Configuration mapping parameter keys to values.
+
+    Returns:
+        Simulation: The configured simulation ready to run.
     """
     # Build other parts
     substrate = build_substrate(config)
@@ -46,18 +67,13 @@ def build_simulation(config) -> Simulation:
     cis_inter = config.get(cfg.CIS_INTER)
 
     adaptation = config.get(cfg.ADAPTATION_ENABLED)
-    mu = 0
-    lambda_ = 0
-    history_length = 0
+    mu = config.get(cfg.ADAPTATION_MU) if adaptation else 0
+    lambda_ = config.get(cfg.ADAPTATION_LAMBDA) if adaptation else 0
+    history_length = config.get(cfg.ADAPTATION_HISTORY) if adaptation else 0
 
     interim_results = config.get(cfg.INTERIM_RESULTS)
     gc_scope = config.get(cfg.GC_SCOPE)
     substrate_scope = config.get(cfg.SUBSTRATE_SCOPE)
-
-    if adaptation:
-        mu = config.get(cfg.ADAPTATION_MU)
-        lambda_ = config.get(cfg.ADAPTATION_LAMBDA)
-        history_length = config.get(cfg.ADAPTATION_HISTORY)
 
     # Initialize the Simulation object with the new parameters
     simulation = Simulation(config, substrate, growth_cones, adaptation, step_size, num_steps, x_step_p, y_step_p,
@@ -69,7 +85,16 @@ def build_simulation(config) -> Simulation:
 
 def build_substrate(config):
     """
-    Build a Substrate instance.
+    Instantiate the correct Substrate subclass based on config type.
+
+    Args:
+        config (dict): Configuration mapping parameter keys to values.
+
+    Returns:
+        Substrate: A configured substrate instance.
+
+    Raises:
+        ValueError: If the substrate type is unrecognized.
     """
     # Extract attributes from the configuration
     rows = config.get(cfg.ROWS)
@@ -133,8 +158,15 @@ def build_substrate(config):
 
 def initialize_growth_cones(config):
     """
-    Initialize and configure growth cones.
+    Create and initialize all GrowthCone instances based on config gradients and scope.
+
+    Args:
+        config (dict): Configuration mapping parameter keys to values.
+
+    Returns:
+        List[GrowthCone]: A list of configured GrowthCone objects.
     """
+
     # Extract parameters from the configuration
     growth_cones = []
     gc_count = config.get(cfg.GC_COUNT)
@@ -149,8 +181,9 @@ def initialize_growth_cones(config):
     gc_r_decay = config.get(cfg.GC_R_DECAY)
     gc_l_decay = config.get(cfg.GC_L_DECAY)
     knock_in = config.get(cfg.KNOCK_IN)
-    fsfac = 50/cols # factor to normalize gradient to match a col-number of 50
+    fsfac = 50/cols # Normalize gradient, to be the same independent on col-number
 
+    # Initialize sensor gradients
     x_positions = np.linspace(1, cols, gc_count)
     center = (cols + 1) / 2
 
@@ -158,9 +191,9 @@ def initialize_growth_cones(config):
     ligands = []
     for position in x_positions:
         receptors.append(gc_r_factor * np.exp(gc_r_decay * (fsfac * (position - center) + gc_r_shift)))
-        ligands.append(gc_l_factor * np.exp(-gc_l_decay * (fsfac * (position - center) + gc_l_shift )))
+        ligands.append(gc_l_factor * np.exp(-gc_l_decay * (fsfac * (position - center) + gc_l_shift)))
 
-
+    # Use this to create an array of "nasal" growth cones
     """
     receptor_value = receptors[int(gc_count * 0.25)]
     ligand_value = ligands[int(gc_count * 0.25)]
@@ -168,7 +201,6 @@ def initialize_growth_cones(config):
     receptors = [receptor_value] * len(receptors)
     ligands = [ligand_value] * len(ligands)
     """
-
 
     # Create an array of evenly distributed y-positions for the growth cones
     y_positions = np.linspace(size, rows - 1 + size, gc_count, dtype=int)
@@ -179,6 +211,7 @@ def initialize_growth_cones(config):
         gc = GrowthCone((size, pos_y), size, ligands[i], receptors[i], i, rho, knock_in)
         growth_cones.append(gc)
 
+    # Get growth cone scope from config and take the appropriate part of the growth cones
     if cfg.current_config.get(cfg.GC_SCOPE) != "full":
         gc_len = int(len(growth_cones))
         half_len = int(gc_len / 2)
@@ -188,7 +221,6 @@ def initialize_growth_cones(config):
             good_gcs = growth_cones[half_len:gc_len]
         else:
             raise Exception("Unknown half gradient type")
-
 
         growth_cones = good_gcs  # only use "good gcs for simulation"
 
