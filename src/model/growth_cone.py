@@ -27,7 +27,8 @@ class GrowthCone:
         self.receptor_current = receptor
         '''
         self.receptor = self.set_receptor(receptor, knock_in)
-        self.ligand = self.set_ligand(ligand, knock_in)
+        self.ligand = ligand
+        # self.ligand = self.set_ligand(ligand, knock_in)
         self.outer_ligand_current = self.ligand * rho
         self.outer_receptor_current = self.receptor * rho
         self.inner_ligand_current = self.ligand * (1 - rho)
@@ -62,14 +63,14 @@ class GrowthCone:
                 f"Reset Force: {self.reset_force}")
 
     def set_receptor(self, receptor, knock_in):
-        if self.id % 2 == 0:
+        if self.id % 2 == 0 and knock_in != 0:
             receptor_new = receptor + knock_in
         else:
             receptor_new = receptor
         return receptor_new
 
     def set_ligand(self, ligand, knock_in):
-        if self.id % 2 == 0:
+        if self.id % 2 == 0 and knock_in != 0:
             ligand_new = 1/self.receptor
         else:
             ligand_new = ligand
