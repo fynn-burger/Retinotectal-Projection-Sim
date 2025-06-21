@@ -12,53 +12,55 @@ def calculate_potential(gc, pos, gcs, substrate, forward_on, reverse_on, ff_inte
     Calculate guidance potential for a growth cone (gc) in a model.
     """
 
-    # Initialize interaction values
-    ft_ligands, ft_receptors = (0, 0)
-    ff_ligands, ff_receptors = (0, 0)
-    ff_coef = 0
+    # get sensor sums
+    gc_outer_receptor_sum, gc_outer_ligand_sum, gc_inner_receptor_sum, gc_inner_ligand_sum = get_sensor_sums(gc)
 
-    gc_outer_receptor_sum = gc.outer_receptor_current * gc.radius * gc.radius * math.pi
-    gc_outer_ligand_sum = gc.outer_ligand_current * gc.radius * gc.radius * math.pi
-    gc_inner_receptor_sum = gc.inner_receptor_current * gc.radius * gc.radius * math.pi
-    gc_inner_ligand_sum = gc.inner_ligand_current * gc.radius * gc.radius * math.pi
+    # Calculate interactions based on toggles
+    # Calculate trans-interaction
+    trans_sig_fwd, trans_sig_rev = calculate_ft_interaction(gc, pos, substrate, gc_outer_receptor_sum,
+                                                            gc_outer_ligand_sum) if ft_inter_on else (0, 0)
 
-    # Compute interactions only if needed
-    if ft_inter_on:
-        ft_ligands, ft_receptors = ft_interaction(gc, pos, substrate)
-    if ff_inter_on:
-        ff_coef = calculate_ff_coef(step, num_steps, sigmoid_steepness, sigmoid_shift, sigmoid_height)
-        ff_ligands, ff_receptors = ff_interaction(gc, pos, gcs)
+    # Calculate fiber-fiber-interaction
+    ff_sig_fwd, ff_sig_rev = calculate_ff_interaction(step, num_steps, sigmoid_steepness, sigmoid_shift, sigmoid_height,
+                                                      gc, pos, gcs, gc_outer_receptor_sum, gc_outer_ligand_sum) \
+        if ff_inter_on else (0, 0)
 
-    # Calculate the forward and reverse signals based on flags
-    forward_sig = reverse_sig = 0
-    if forward_on:
-        trans_sig = gc_outer_receptor_sum * ft_ligands
-        cis_sig = cis_in_fac * (gc_inner_receptor_sum * gc_inner_ligand_sum) \
-            + cis_out_fac * (gc_outer_receptor_sum * gc_outer_ligand_sum) \
-            if cis_inter_on else 0
-        ff_sig = gc_outer_receptor_sum * ff_coef * ff_ligands
-        forward_sig = trans_sig + cis_sig + ff_sig
-    if reverse_on:
-        trans_sig = gc_outer_ligand_sum * ft_receptors
-        cis_sig = cis_in_fac * (gc_inner_receptor_sum * gc_inner_ligand_sum) \
-            + cis_out_fac * (gc_outer_receptor_sum * gc_outer_ligand_sum) \
-            if cis_inter_on else 0
-        ff_sig = gc_outer_ligand_sum * ff_coef * ff_receptors
-        reverse_sig = trans_sig + cis_sig + ff_sig
+    # Calculate cis-interaction
+    cis_sig_fwd = cis_sig_rev = calculate_cis_interaction(cis_in_fac, cis_out_fac, gc_outer_receptor_sum,
+                                                          gc_outer_ligand_sum, gc_inner_receptor_sum,
+                                                          gc_inner_ligand_sum) if cis_inter_on else 0
 
-    # Round and calculate the potential
-    forward_sig = float("{:.6f}".format(forward_sig))
-    reverse_sig = float("{:.6f}".format(reverse_sig))
+    # Calculate forward and reverse signals based on flags
+    forward_sig = trans_sig_fwd + ff_sig_fwd + cis_sig_fwd if forward_on else 0
+    reverse_sig = trans_sig_rev + ff_sig_rev + cis_sig_rev if reverse_on else 0
 
-    # Ensure signals are strictly positive
-    forward_sig = max(forward_sig, 0.0001)
-    reverse_sig = max(reverse_sig, 0.0001)
+    # Use non-zero values for forward and reverse sig and format value
+    forward_sig = max(float("{:.6f}".format(forward_sig)), 0.0001)
+    reverse_sig = max(float("{:.6f}".format(reverse_sig)), 0.0001)
 
     # Calculate and return the potential
     return abs(math.log(reverse_sig) - math.log(forward_sig))
 
 
-def ft_interaction(gc, pos, substrate):
+def calculate_ft_interaction(gc, pos, substrate, gc_outer_receptor_sum, gc_outer_ligand_sum):
+    ft_ligands, ft_receptors = get_ft_sensors(gc, pos, substrate)
+    return gc_outer_receptor_sum * ft_ligands, gc_outer_ligand_sum * ft_receptors
+
+
+def calculate_ff_interaction(step, num_steps, sigmoid_steepness, sigmoid_shift, sigmoid_height, gc, pos, gcs,
+                             gc_outer_receptor_sum, gc_outer_ligand_sum):
+    ff_coef = calculate_ff_coef(step, num_steps, sigmoid_steepness, sigmoid_shift, sigmoid_height)
+    ff_ligands, ff_receptors = get_ff_sensors(gc, pos, gcs)
+    return gc_outer_receptor_sum * ff_coef * ff_ligands, gc_outer_ligand_sum * ff_coef * ff_receptors
+
+
+def calculate_cis_interaction(cis_in_fac, cis_out_fac, gc_outer_receptor_sum, gc_outer_ligand_sum,
+                              gc_inner_receptor_sum, gc_inner_ligand_sum):
+    return cis_in_fac * (gc_inner_receptor_sum * gc_inner_ligand_sum) \
+            + cis_out_fac * (gc_outer_receptor_sum * gc_outer_ligand_sum)
+
+
+def get_ft_sensors(gc, pos, substrate):
     """
     Calculate fiber-target interaction between a growth cone and a substrate.
     """
@@ -84,7 +86,7 @@ def ft_interaction(gc, pos, substrate):
     return sum_ligands, sum_receptors
 
 
-def ff_interaction(gc1, pos, gcs):
+def get_ff_sensors(gc1, pos, gcs):
     """
     Calculate the fiber-fiber interaction between a growth cone (gc1) and a list of other growth cones (gcs).
     """
@@ -160,3 +162,12 @@ def intersection_area(gc1_pos, gc2_pos, radius):
         if sector < triangle:
             print(sector, triangle)
         return (sector - triangle) * 2
+
+
+def get_sensor_sums(gc):
+    gc_area = gc.radius * gc.radius * math.pi
+    outer_r_sum = gc.outer_receptor_current * gc_area
+    outer_l_sum = gc.outer_ligand_current * gc_area
+    inner_r_sum = gc.inner_receptor_current * gc_area
+    inner_l_sum = gc.inner_ligand_current * gc_area
+    return outer_r_sum, outer_l_sum, inner_r_sum, inner_l_sum
