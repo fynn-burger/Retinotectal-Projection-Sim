@@ -13,23 +13,23 @@ class GrowthCone:
     Represents a growth cone in the simulation environment.
 
     Attributes:
-        pos (tuple[float, float]): Current (x, y) center position of the growth cone.
-        radius (int): Radius of the circular growth cone (+1 for FT-Interaction).
-        id (int): Unique identifier for the growth cone.
-        receptor (float): Base receptor level (possibly adjusted by knock-in).
-        ligand (float): Base ligand level (possibly adjusted by knock-in).
-        outer_receptor_current (float): Current outer receptor sensor value (scaled by rho).
-        outer_ligand_current (float): Current outer ligand sensor value (scaled by rho).
-        inner_receptor_current (float): Current inner receptor sensor value (scaled by rho).
-        inner_ligand_current (float): Current inner ligand sensor value (scaled by rho).
-        potential (float): Latest computed potential value for this cone.
-        adap_co (float): Current adaptation coefficient.
-        reset_force (float): Current resetting force for rho.
-        rho_current (float): Current receptor fraction used to split outer/inner sensors.
-        history (History): Time history of potentials, positions, sensors, and rho.
-        freeze (bool): Whether the growth cone is frozen.
+        pos: Current (x, y) center position of the growth cone.
+        radius: Radius of the circular growth cone (+1 for FT-Interaction).
+        id: Unique identifier for the growth cone.
+        receptor: Base receptor level (possibly adjusted by knock-in).
+        ligand: Base ligand level (possibly adjusted by knock-in).
+        outer_receptor_current: Current outer receptor sensor value (scaled by rho).
+        outer_ligand_current: Current outer ligand sensor value (scaled by rho).
+        inner_receptor_current: Current inner receptor sensor value (scaled by rho).
+        inner_ligand_current: Current inner ligand sensor value (scaled by rho).
+        potential: Latest computed potential value for this cone.
+        adap_co: Current adaptation coefficient.
+        reset_force: Current resetting force for rho.
+        rho_current: Current receptor fraction used to split outer/inner sensors.
+        history: Time history of potentials, positions, sensors, and rho.
+        freeze: Whether the growth cone is frozen.
     """
-    def __init__(self, position: tuple[float, float], size: int, ligand: float, receptor: float, id: int, rho: float,
+    def __init__(self, position: tuple[int, int], size: int, ligand: float, receptor: float, id: int, rho: float,
                  knock_in: float, freeze: bool = False):
         self.pos = position
         self.radius = size
@@ -175,15 +175,15 @@ class History:
     Records time history of a GrowthCone's key state variables.
 
     Attributes:
-        potential (list[float]): List of past potential values.
-        adap_co (list[float]): List of past adaptation coefficients.
-        position (list[tuple]): List of past positions.
-        outer_ligand (list[float]): List of past outer ligand values.
-        outer_receptor (list[float]): List of past outer receptor values.
-        inner_ligand (list[float]): List of past inner ligand values.
-        inner_receptor (list[float]): List of past inner receptor values.
-        rho (list[float]): List of past rho values.
-        reset_force (list[float]): List of past resetting forces.
+        potential: List of past potential values.
+        adap_co: List of past adaptation coefficients.
+        position: List of past positions.
+        outer_ligand: List of past outer ligand values.
+        outer_receptor: List of past outer receptor values.
+        inner_ligand: List of past inner ligand values.
+        inner_receptor: List of past inner receptor values.
+        rho: List of past rho values.
+        reset_force: List of past resetting forces.
     """
     def __init__(self, potential_ini: float, adap_co_ini: float, position_ini: tuple[float, float],
                  outer_ligand_ini: float, outer_receptor_ini: float, inner_ligand_ini: float, inner_receptor_ini: float,
