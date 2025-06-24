@@ -208,7 +208,7 @@ def initialize_growth_cones(config):
     for i in range(gc_count):
         # Create a GrowthCone instance and initialize it
         pos_y = y_positions[i]
-        gc = GrowthCone((size, pos_y), size, ligands[i], receptors[i], i, rho, knock_in)
+        gc = GrowthCone((int(size), int(pos_y)), size, ligands[i], receptors[i], i, rho, knock_in)
         growth_cones.append(gc)
 
     # Get growth cone scope from config and take the appropriate part of the growth cones
