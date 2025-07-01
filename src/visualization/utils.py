@@ -73,9 +73,9 @@ def plot_trajectories_on_substrate(result, substrate, cones, show: bool = True):
     return fig
 
 
-def plot_trajectories(result, cones, show: bool = True):
+def plot_trajectories(result, cones, gc_color='blue', show: bool = True):
     path = os.path.join(cfg.current_config.get(cfg.FOLDER_PATH), "trajectories.png")
-    fig = vz.visualize_trajectories(result, cones)
+    fig = vz.visualize_trajectories(result, cones, color=gc_color)
     save_and_show(fig, path, show)
     return fig
 

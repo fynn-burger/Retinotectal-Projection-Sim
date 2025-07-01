@@ -60,7 +60,7 @@ def visualize_data_points(x, y, x_label, y_label, title, mutated_idx, growth_con
             [x[i] for i in wildtype_idx if i in active_idx],
             [y[i] for i in wildtype_idx if i in active_idx],
             '*',
-            color='red',
+            color='blue',
             label='wildtype' if mutated_idx else 'active',
         )
         # Mutated cones
@@ -69,7 +69,7 @@ def visualize_data_points(x, y, x_label, y_label, title, mutated_idx, growth_con
                 [x[i] for i in mutated_idx if i in active_idx],
                 [y[i] for i in mutated_idx if i in active_idx],
                 '*',
-                color='blue',
+                color='red',
                 label='mutated'
             )
         # Frozen cones
@@ -235,11 +235,11 @@ def add_linear_regression(x, y, knock_in=False):
 def add_polynomial_fit(x, y, knock_in=False):
     coeffs = np.polyfit(x, y, 3)
     poly = np.poly1d(coeffs)
-    plt.plot(x, poly(x), color='red' if knock_in is False else 'blue', label="Cubic Fit")
+    plt.plot(x, poly(x), color='blue' if knock_in is False else 'red', label="Cubic Fit")
     return poly
 
 
-def visualize_trajectories(result, growth_cones, trajectory_freq=50):
+def visualize_trajectories(result, growth_cones, color='blue', trajectory_freq=50):
     # Start from a blank figure (no blended background)
     fig, ax = plt.subplots()
     ax.set_xlim(0, result.config["cols"] + 2*result.config["gc_size"])
@@ -253,7 +253,7 @@ def visualize_trajectories(result, growth_cones, trajectory_freq=50):
         marker='*',
         linestyle='',
         markersize=12,
-        color='red',
+        color=color,
         zorder=10,
         label='Tectum End‐positions'
     )
@@ -266,7 +266,7 @@ def visualize_trajectories(result, growth_cones, trajectory_freq=50):
             trajectory_y,
             linestyle='-',
             linewidth=1,
-            color='red',
+            color=color,
             label=f'Growth Cone {idx}'
         )
 
