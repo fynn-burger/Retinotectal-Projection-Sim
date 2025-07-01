@@ -14,13 +14,25 @@ from experiments.two_phase import two_phase_experiments
 
 # --- Define parameters you want to test ---
 SWEEPS = {
-    cfg.SUBSTRATE_TYPE: [cfg.GAP],
-    cfg.CONT_GRAD_R_DECAY: [0.03],
-    cfg.CONT_GRAD_L_DECAY: [0.03],
-    cfg.GAP_FIRST_BLOCK_CONC: [0],
-    cfg.GAP_SECOND_BLOCK_CONC:[5, 7, 10],
-    cfg.X_STEP_POSSIBILITY: [0.65],
-    cfg.FF_INTER: [False]
+    # Choose at least one sim-module and one experiment
+    # Use Continuous gradients when using two-phase experiment
+    'sim_module': [main, two_phase_experiments],
+    'experiments': [
+        "CONTINUOUS_GRADIENTS",
+        "STRIPE",
+        "GAP",
+        "GAP_INV",
+        "SINGLE_MAPPING_CONFIG",
+        "EXPANSION_CONFIG",
+        "COMPRESSION_CONFIG",
+        "MISMATCH_CONFIG",
+        "KNOCK_IN_HOM_CONFIG",
+        "KNOCK_IN_HET_CONFIG",
+        "RECEPTOR_STRIPE_CONFIG",
+        "LIGAND_STRIPE_CONFIG"
+    ],
+    # --- Type in folder name for results
+    cfg.FOLDER_PATH: ["Test run of all standards"]
 }
 
 # --- Define specific combination of parameters you want to exclusively test
@@ -28,34 +40,49 @@ SELECTED_COMBOS = [
 ]
 
 
-def run_batch(sim_module: object) -> None:
+def run_batch() -> None:
     """Run multiple simulations with different parameters in one batch.
 
     Args:
         sim_module: Module with a .run() function.
     """
 
-    # --- Type in folder name for results
-    cfg.current_config[cfg.FOLDER_PATH] = "Tests after carrying over from expon"
-
-    base = cfg.current_config.copy()
     keys, values = zip(*SWEEPS.items())
 
     for combo in itertools.product(*values):
+        combo_tag = ""
         if combo not in SELECTED_COMBOS and len(SELECTED_COMBOS) != 0:
             continue
-        cfg.current_config = base.copy()
+        # Extract sim_module and load it
+        idx_mod = keys.index('sim_module')
+        sim_module = combo[idx_mod]
+        idx_exp = keys.index('experiments')
+        experiment = combo[idx_exp]
+
+        if sim_module == two_phase_experiments and experiment != "CONTINUOUS_GRADIENTS":
+            print(sim_module, experiment)
+            continue
+
+        # Extract substrate type and load its default config depending on simulation module
+        if sim_module == main:
+            cfg.current_config = cfg.get_default_config(experiment).copy()
+        elif sim_module == two_phase_experiments:
+            combo_tag = "two_phase"
+            cfg.current_config = cfg.get_default_config(cfg.CONTINUOUS_GRADIENTS).copy()
+
+        # Apply additional parameters
         for k, v in zip(keys, combo):
+            if k == 'experiments' or k == 'sim_module':
+                continue
             cfg.current_config[k] = v
 
-        combo_tag = "__".join(
-            f"{k.split('_')[-1]}={v}" for k, v in zip(keys, combo)
+        combo_tag += "__".join(
+            f"{k.split('_')[-1]}={v}" for k, v in zip(keys, combo) if k != 'sim_module' and k != 'folder_path'
         )
         cfg.current_config[cfg.FOLDER_NAME] = combo_tag
-
         sim_module.run()
 
 
 if __name__ == '__main__':
     with PreventSleep():
-        run_batch(main)  # at the moment either two_phase_experiments or main
+        run_batch()
