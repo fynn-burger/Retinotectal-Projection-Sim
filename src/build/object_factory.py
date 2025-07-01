@@ -193,15 +193,6 @@ def initialize_growth_cones(config):
         receptors.append(gc_r_factor * np.exp(gc_r_decay * (fsfac * (position - center) + gc_r_shift)))
         ligands.append(gc_l_factor * np.exp(-gc_l_decay * (fsfac * (position - center) + gc_l_shift)))
 
-    # Use this to create an array of "nasal" growth cones
-    """
-    receptor_value = receptors[int(gc_count * 0.25)]
-    ligand_value = ligands[int(gc_count * 0.25)]
-
-    receptors = [receptor_value] * len(receptors)
-    ligands = [ligand_value] * len(ligands)
-    """
-
     # Create an array of evenly distributed y-positions for the growth cones
     y_positions = np.linspace(size, rows - 1 + size, gc_count, dtype=int)
 
