@@ -4,7 +4,6 @@ from build import utils
 from visualization import utils as vz
 
 
-
 def run():
     folder_path = utils.create_simulation_folder()
     utils.write_config_to_text(folder_path)
