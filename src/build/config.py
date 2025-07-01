@@ -210,8 +210,8 @@ gap_substrate = {
 
 gap_inv_substrate = {
     SUBSTRATE_TYPE: GAP_INV,
-    ROWS: 46,
-    COLS: 166,
+    ROWS: 200,
+    COLS: 200,
     GAP_BEGIN: 0.4,
     GAP_END: 0.3,
     GAP_FIRST_BLOCK: RECEPTOR,
@@ -222,17 +222,75 @@ gap_inv_substrate = {
         DEFAULT_CONFIGURATIONS
 --------------------------------------
 """
-continuous_gradients_config = {
+normal_mapping_config = {
     **standard_parameters,
     **continuous_substrate
 }
+single_mapping_config = {
+    **standard_parameters,
+    **continuous_substrate,
+    FF_INTER: False
+}
 
-stripe_config = {
+expansion_config = {
+    **standard_parameters,
+    **continuous_substrate,
+    GC_SCOPE: "nasal"
+}
+
+compression_config = {
+    **standard_parameters,
+    **continuous_substrate,
+    SUBSTRATE_SCOPE: "anterior",
+}
+
+mismatch_config = {
+    **standard_parameters,
+    **continuous_substrate,
+    GC_SCOPE: "nasal",
+    SUBSTRATE_SCOPE: "anterior",
+    STEP_NUM: 15000
+}
+
+knock_in_hom_config = {
+    **standard_parameters,
+    **continuous_substrate,
+    KNOCK_IN: 1.25
+}
+
+knock_in_het_config = {
+    **standard_parameters,
+    **continuous_substrate,
+    KNOCK_IN: 0.625
+}
+
+double_stripe_config = {
     **standard_parameters,
     **stripe_substrate,
     X_STEP_POSSIBILITY: 0.65,
     SIGMOID_HEIGHT: 1,
-    GC_COUNT: 50
+    GC_COUNT: 50,
+    INTERIM_RESULTS: [],
+}
+
+receptor_stripe_config = {
+    **standard_parameters,
+    **stripe_substrate,
+    X_STEP_POSSIBILITY: 0.65,
+    SIGMOID_HEIGHT: 1,
+    GC_COUNT: 50,
+    STRIPE_FWD: False,
+    INTERIM_RESULTS: [],
+}
+
+ligand_stripe_config = {
+    **standard_parameters,
+    **stripe_substrate,
+    X_STEP_POSSIBILITY: 0.65,
+    SIGMOID_HEIGHT: 1,
+    GC_COUNT: 50,
+    STRIPE_REW: False,
+    INTERIM_RESULTS: [],
 }
 
 gap_config = {
@@ -240,7 +298,8 @@ gap_config = {
     **gap_substrate,
     X_STEP_POSSIBILITY: 0.65,
     SIGMOID_HEIGHT: 1,
-    GC_COUNT: 12
+    GC_COUNT: 12,
+    INTERIM_RESULTS: [],
 }
 
 gap_inv_config = {
@@ -248,7 +307,8 @@ gap_inv_config = {
     **gap_inv_substrate,
     X_STEP_POSSIBILITY: 0.65,
     SIGMOID_HEIGHT: 1,
-    GC_COUNT: 12
+    GC_COUNT: 12,
+    INTERIM_RESULTS: [],
 }
 
 wedges_config = {
@@ -267,7 +327,7 @@ wedges_config = {
 
 custom_config = {
     # Choose Substrate
-    **continuous_gradients_config,
+    **normal_mapping_config,
     # **stripe_config,
     # **gap_config,
     # **gap_inv_config,
@@ -291,26 +351,52 @@ current_config = custom_config
 """
 
 default_configs = {
+    # use this name in to be congruent with frontend
     "CONTINUOUS_GRADIENTS": {
-        **continuous_gradients_config
+        **normal_mapping_config
     },
     "WEDGES": {
         **wedges_config
     },
+    #  use this name to be congruent with frontend
     "STRIPE": {
-        **stripe_config
+        **double_stripe_config
     },
     "GAP": {
         **gap_config
     },
     "GAP_INV": {
         **gap_inv_config
+    },
+    "SINGLE_MAPPING_CONFIG": {
+        **single_mapping_config
+    },
+    "EXPANSION_CONFIG": {
+        **expansion_config
+    },
+    "COMPRESSION_CONFIG": {
+        **compression_config
+    },
+    "MISMATCH_CONFIG": {
+        **mismatch_config
+    },
+    "KNOCK_IN_HOM_CONFIG": {
+        **knock_in_hom_config
+    },
+    "KNOCK_IN_HET_CONFIG": {
+        **knock_in_het_config
+    },
+    "RECEPTOR_STRIPE_CONFIG": {
+        **receptor_stripe_config
+    },
+    "LIGAND_STRIPE_CONFIG": {
+        **ligand_stripe_config
     }
 }
 
 
-def get_default_config(substrate_type):
-    return default_configs.get(substrate_type.upper(), {})
+def get_default_config(experiment_type):
+    return default_configs.get(experiment_type.upper(), {})
 
 
 
