@@ -249,19 +249,19 @@ mismatch_config = {
     **continuous_substrate,
     GC_SCOPE: "nasal",
     SUBSTRATE_SCOPE: "anterior",
-    STEP_NUM: 15000
+    STEP_NUM: 30000
 }
 
 knock_in_hom_config = {
     **standard_parameters,
     **continuous_substrate,
-    KNOCK_IN: 1.25
+    KNOCK_IN: 1
 }
 
 knock_in_het_config = {
     **standard_parameters,
     **continuous_substrate,
-    KNOCK_IN: 0.625
+    KNOCK_IN: 0.5
 }
 
 double_stripe_config = {
