@@ -1,49 +1,45 @@
 """
-Module providing Result class for result representation.
+Module providing Result class containing all simulation information and methods to retrieve it for representation.
 """
 
 import numpy as np
 
 
 class Result:
-    def __init__(self, simulation, runtime, config):
+    """
+    Encapsulates the outputs of a simulation, offering summary statistics and projection mappings for analysis and
+    visualization.
+    """
+
+    def __init__(self, simulation, runtime: float, config: dict):
         """
-        Initializes a Result object.
+        Initialize a Result instance.
+
+        Args:
+            simulation: Simulation object with containing all information saved during the simulation
+            runtime: Elapsed computation time in seconds.
+            config: Configuration used for the simulation.
         """
         self.config = config
         self.simulation = simulation
         self.runtime = runtime
 
-    def get_gc_count(self):
-        return len(self.simulation.growth_cones)
+    def get_mapping(self, attribute: str = "id") -> tuple[np.ndarray, np.ndarray]:
+        """Generates a projection mapping representation based on a specified attribute.
+        Supports 'id', or 'final_pos' for y-axis mapping.
 
-    def get_num_steps(self):
-        return self.simulation.num_steps
+        Args:
+            attribute: determines the attribute to be mapped.
 
-    def get_summary(self):
-        """
-        Returns a summary dictionary with key simulation parameters and runtime.
-        """
-        return {
-            "totalGrowthCones": self.get_gc_count(),
-            "simulationSteps": self.get_num_steps(),
-            "computationTime": f"{self.runtime:.3f}",
-            "config": self.config,
-        }
-
-    def get_mapping(self, attribute="id"):
-        """
-        Generates a projection mapping representation based on a specified attribute.
-        Supports 'id', 'start_pos', or 'final_pos' for y-axis mapping.
-
-        :param attribute: Attribute for y-axis values ('id', 'start_pos', 'final_pos').
+        Returns:
+            x_values: Array containing final position of anterior-posterior-axis of all growth cones
+            y-values:
+                With attribute "id": Array containing all growth cone ids, as proxy for their nasal-temporal start-pos
+                With attribute "final_pos": Array containing final position on nasal-temporal-axis of all growth cones
         """
         x_values = np.array([gc.pos[0] for gc in self.simulation.growth_cones])
         if attribute == "id":
             y_values = np.array([gc.id for gc in self.simulation.growth_cones])
-        elif attribute == "start_pos":
-            y_values = np.array(
-                [gc.get_start_pos()[1] for gc in self.simulation.growth_cones])
         elif attribute == "final_pos":
             y_values = np.array([gc.pos[1] for gc in self.simulation.growth_cones])
         else:
@@ -51,31 +47,19 @@ class Result:
 
         return x_values, y_values
 
-    def get_projection_ypos(self):
-        """
-        Generates a projection mapping based on initial y-positions of growth cones.
-        """
-        return self.get_mapping(attribute="start_pos")
-
-    def get_projection_id(self):
+    def get_projection_id(self) -> tuple[np.ndarray, np.ndarray]:
         """
         Generates a projection mapping based on the ids of growth cones.
         """
         return self.get_mapping(attribute="id")
 
-    def get_projection_halved(self):
-        """
-        Generates a halved projection mapping based on the ids of growth cones.
-        """
-        return self.get_mapping(attribute="id", halved=True)
-
-    def get_final_positioning(self):
+    def get_final_positioning(self) -> tuple[np.ndarray, np.ndarray]:
         """
         Retrieves the final positions of the growth cones after the model.
         """
         return self.get_mapping(attribute="final_pos")
 
-    def __str__(self):
+    def __str__(self) -> tuple[str, str]:
         """
         Returns a string representation of the projection representation.
         """
