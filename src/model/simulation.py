@@ -36,9 +36,10 @@ class Simulation:
         history_length (int): The number of historical steps to consider for adaptation.
     """
 
-    def __init__(self, config, substrate, growth_cones, adaptation, step_size, num_steps, x_step_p, y_step_p, sigmoid_steepness,
-                 sigmoid_shift, sigmoid_height, cis_in_fac, cis_out_fac, sigma, force, forward_sig, reverse_sig,
-                 ff_inter, ft_inter,cis_inter, mu, lambda_, history_length, interim_results, gc_scope, substrate_scope):
+    def __init__(self, config, substrate, growth_cones, adaptation, step_size, num_steps, x_step_p, y_step_p,
+                 sigmoid_steepness, sigmoid_shift, sigmoid_height, cis_in_fac, cis_out_fac, sigma, force, forward_sig,
+                 reverse_sig, ff_inter, ft_inter, cis_inter, mu, lambda_, history_length, interim_results, gc_scope,
+                 substrate_scope, mask):
         self.config = config
         self.forward_sig = forward_sig
         self.reverse_sig = reverse_sig
@@ -65,6 +66,7 @@ class Simulation:
         self.interim_results = interim_results
         self.gc_scope = gc_scope
         self.substrate_scope = substrate_scope
+        self.mask = mask
 
     def run(self):
         """
@@ -85,12 +87,19 @@ class Simulation:
         """
         Initializes the potential values for each growth cone.
         """
+
+        all_gc_lig = np.zeros_like(self.substrate.ligands)
+        all_gc_rec = np.zeros_like(self.substrate.receptors)
+        if self.ff_inter:
+            all_gc_lig, all_gc_rec = self.fold_gc()
+
         for gc in self.growth_cones:
             # Potential initialization
-            gc.potential = calculate_potential(gc, gc.pos, self.growth_cones, self.substrate, self.forward_sig,
+            gc.potential = calculate_potential(gc, gc.pos, self.substrate, self.forward_sig,
                                                self.reverse_sig, self.ff_inter, self.ft_inter, self.cis_inter, 0,
                                                self.num_steps, self.sigmoid_steepness, self.sigmoid_shift,
-                                               self.sigmoid_height, self.cis_in_fac, self.cis_out_fac)
+                                               self.sigmoid_height, self.cis_in_fac, self.cis_out_fac, all_gc_lig,
+                                               all_gc_rec, self.mask)
 
             print(gc.__str__())
 
@@ -108,6 +117,12 @@ class Simulation:
             print(f"Current Step: {step_current}")
 
     def handle_growth_cones(self, step_current):
+
+        all_gc_lig = np.zeros_like(self.substrate.ligands)
+        all_gc_rec = np.zeros_like(self.substrate.receptors)
+        if self.ff_inter:
+            all_gc_lig, all_gc_rec = self.fold_gc()
+
         for gc in self.growth_cones:
             if gc.freeze:
                 continue
@@ -115,18 +130,18 @@ class Simulation:
                 self.adapt_growth_cone(gc)
 
             # Calculate current potential of gc
-            gc.potential = calculate_potential(gc, gc.pos, self.growth_cones, self.substrate,
+            gc.potential = calculate_potential(gc, gc.pos, self.substrate,
                                                self.forward_sig, self.reverse_sig, self.ff_inter,
                                                self.ft_inter, self.cis_inter, step_current, self.num_steps,
                                                self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height,
-                                               self.cis_in_fac, self.cis_out_fac)
+                                               self.cis_in_fac, self.cis_out_fac, all_gc_lig, all_gc_rec, self.mask)
             # calculate potential of possible next step
             pos_new = self.gen_random_step(gc)
-            potential_new = calculate_potential(gc, pos_new, self.growth_cones, self.substrate,
+            potential_new = calculate_potential(gc, pos_new, self.substrate,
                                                 self.forward_sig, self.reverse_sig, self.ff_inter,
                                                 self.ft_inter, self.cis_inter, step_current, self.num_steps,
                                                 self.sigmoid_steepness, self.sigmoid_shift, self.sigmoid_height,
-                                                self.cis_in_fac, self.cis_out_fac)
+                                                self.cis_in_fac, self.cis_out_fac, all_gc_lig, all_gc_rec, self.mask)
             self.step_decision(gc, pos_new, potential_new)
 
     def create_interim_results(self, step_current):
@@ -187,6 +202,28 @@ class Simulation:
             return self.gen_random_step(gc)
         return new_x, new_y
 
+    def fold_gc(self) -> tuple[np.ndarray, np.ndarray]:
+        """ Apply mask onto all gcs to create a discrete field of all gc-sensor values, that maps to the substrate
+
+        Returns:
+            all_gc_lig: Array containing all outer growth cone ligands in their respective position
+            all_gc_rec: Array containing all outer growth cone receptors in their respective position
+        """
+        all_gc_lig = np.zeros_like(self.substrate.ligands)
+        all_gc_rec = np.zeros_like(self.substrate.receptors)
+
+        for gc in self.growth_cones:
+            radius = gc.radius
+            xc, yc = gc.pos[0], gc.pos[1]
+            x0, x1 = xc - radius, xc + radius + 1
+            y0, y1 = yc - radius, yc + radius + 1
+
+            lig_patch = gc.outer_ligand_current * self.mask
+            rec_patch = gc.outer_receptor_current * self.mask
+            all_gc_lig[y0:y1, x0:x1] += lig_patch
+            all_gc_rec[y0:y1, x0:x1] += rec_patch
+        return all_gc_lig, all_gc_rec
+
 
 """
 Utility functions needed for step decision
@@ -194,8 +231,7 @@ Utility functions needed for step decision
 
 
 def clamp_to_boundaries(new_x, new_y, substrate, size):
-
-    if new_x < size or new_x > substrate.cols - 1- size:
+    if new_x < size or new_x > substrate.cols - 1 - size:
         return False
 
     if new_y < size or new_y > substrate.rows - 1 - size:
@@ -205,9 +241,7 @@ def clamp_to_boundaries(new_x, new_y, substrate, size):
 
 
 def probabilistic_density(potential, sigma):
-    # let this function as it is for now, it is already pretty intuitive if you know sigma is the standard deviation
     return math.exp(-potential ** 2 / (2 * sigma ** 2)) / (math.sqrt(2 * math.pi) * sigma)
-    # return np.exp(- np.abs(potential) / sigma) / (2 * sigma)
 
 
 def calculate_step_probability(old_prob, new_prob):

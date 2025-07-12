@@ -15,6 +15,7 @@ from model.growth_cone import GrowthCone
 from model.simulation import Simulation
 from model.substrate import (ContinuousGradientSubstrate, WedgeSubstrate,
                              StripeSubstrate, GapSubstrate, GapSubstrateInverted)
+from build.utils import build_gc_mask
 
 
 def build_default() -> Simulation:
@@ -65,6 +66,7 @@ def build_simulation(config) -> Simulation:
     ff_inter = config.get(cfg.FF_INTER)
     ft_inter = config.get(cfg.FT_INTER)
     cis_inter = config.get(cfg.CIS_INTER)
+    mask = build_gc_mask(config.get(cfg.GC_SIZE))
 
     adaptation = config.get(cfg.ADAPTATION_ENABLED)
     mu = config.get(cfg.ADAPTATION_MU) if adaptation else 0
@@ -79,7 +81,7 @@ def build_simulation(config) -> Simulation:
     simulation = Simulation(config, substrate, growth_cones, adaptation, step_size, num_steps, x_step_p, y_step_p,
                             sigmoid_steepness, sigmoid_shift, sigmoid_height, cis_in_fac, cis_out_fac,
                             sigma, force, forward_sig, reverse_sig, ff_inter, ft_inter, cis_inter, mu, lambda_,
-                            history_length, interim_results, gc_scope, substrate_scope)
+                            history_length, interim_results, gc_scope, substrate_scope, mask)
     return simulation
 
 
