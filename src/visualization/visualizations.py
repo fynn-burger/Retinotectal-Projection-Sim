@@ -1,4 +1,7 @@
+import os
 import sys
+import csv
+from build import config as cfg
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
@@ -43,6 +46,8 @@ def visualize_image(image, title, rect=None):
     if rect:
         ax.add_patch(plt.Rectangle(*rect, fill=False, edgecolor='black', lw=2))
     ax.set_ylim(ax.get_ylim()[::-1])  # Flip y-axis
+    ax.set_xticks([])
+    ax.set_yticks([])
     return fig
 
 
@@ -61,7 +66,7 @@ def visualize_data_points(x, y, x_label, y_label, title, mutated_idx, growth_con
             [y[i] for i in wildtype_idx if i in active_idx],
             '*',
             color='blue',
-            label='wildtype' if mutated_idx else 'active',
+            label='wildtype' if mutated_idx else 'second wave',
         )
         # Mutated cones
         if mutated_idx:
@@ -80,13 +85,17 @@ def visualize_data_points(x, y, x_label, y_label, title, mutated_idx, growth_con
                 '*',
                 color='gray',
                 alpha=0.6,
-                label='frozen'
+                label='first wave'
             )
     else:
         ax.plot(x, y, '*', **kwargs)
-    ax.set_title(title)
-    ax.set_xlabel(x_label)
-    ax.set_ylabel(y_label)
+    # set title and axis labels with a bigger font
+    ax.set_title(title, fontsize=32, fontweight='bold', pad=20)        # title slightly larger
+    ax.set_xlabel(x_label, fontsize=32)
+    ax.set_ylabel(y_label, fontsize=32)
+
+    # enlarge tick labels
+    ax.tick_params(axis='both', which='major', labelsize=18)
     ax.set_xlim(0, 100)
     ax.set_ylim(0, 100)
     return fig
@@ -134,12 +143,12 @@ def visualize_growth_cones(gcs):
 
 def visualize_results_on_substrate(result, substrate):
     blended_colors = create_blended_colors(substrate.ligands, substrate.receptors)
-    fig = visualize_image(blended_colors, "Tectum End-positions on Color-Mixed Substrate")
+    fig = visualize_image(blended_colors, "")
     x_values, y_values = result.get_final_positioning()
-    plt.plot(x_values, y_values, '*', color='orange', label='Tectum End-positions')
-    plt.legend()
-    plt.xlabel("n-t Axis of Retina")
-    plt.ylabel("d-v Axis of Retina")
+    plt.plot(x_values, y_values, '*', color='orange', markersize=20)
+    #plt.legend()
+    #plt.xlabel("n-t Axis of Retina")
+    #plt.ylabel("d-v Axis of Retina")
     return fig
 
 
@@ -162,7 +171,7 @@ def visualize_projection(result, substrate, fit_type="linear", gc_scope="full", 
 
     # create figure
     fig = visualize_data_points(nt_values_normalized, ap_values_normalized,
-                                "% n-t Axis of Retina","% a-p Axis of Target", "Projection Mapping",
+                                "% n-t Axis of Retina","% a-p Axis of Target", "ki/ki - no FF-Interaction",
                                 mutated_idx, growth_cones=growth_cones)
     # calculate regression
     try:
@@ -195,15 +204,19 @@ def visualize_projection(result, substrate, fit_type="linear", gc_scope="full", 
                 deltas = np.abs(poly_wt(xs) - poly_knock(xs))
 
                 mask = deltas <= eps
-                if mask.any():
-                    x0, x1 = xs[mask][[0, -1]]
-                    mid = 0.5 * (x0 + x1)
-                    ymid = poly_wt(mid)
+                csv_path = os.path.join(cfg.current_config.get(cfg.FOLDER_PATH), "x0s.csv")
+                with open(csv_path, mode="a", newline="") as f:
+                    writer = csv.writer(f)
+                    if mask.any():
+                        x0, x1 = xs[mask][[0, -1]]
+                        plt.axvspan(x0, x1, color='gray', alpha=0.2)
 
-                    # shade the zone and mark the midpoint
-                    label_text = f"Zone ab x={x0:.2f} (Δ≤{eps:.2f})"
+                        # shade the zone and mark the midpoint
+                        label_text = f"Zone ab x={x0:.2f} (Δ≤{eps:.2f})"
+                        writer.writerow([f"{x0:.2f}"])
+                    else:
+                        writer.writerow([100])
 
-                    plt.axvspan(x0, x1, color='gray', alpha=0.2, label=label_text)
             else:
                 add_polynomial_fit(nt_values_normalized, ap_values_normalized)
     except ValueError as e:
@@ -212,7 +225,8 @@ def visualize_projection(result, substrate, fit_type="linear", gc_scope="full", 
     if gc_scope != "full" or substrate_scope != "full" and isinstance(substrate, ContinuousGradientSubstrate):
         create_halved_projection(gc_scope, substrate_scope)
 
-    plt.legend()
+    leg = plt.legend(fontsize=30, markerscale=2.5)
+    fig.tight_layout()
     return fig
 
 
@@ -224,9 +238,7 @@ def add_linear_regression(x, y, knock_in=False):
         null_point_x = -intercept / slope if slope != 0 else None
 
         # Plot the regression line
-        plt.plot(x, regression_line, color='red' if knock_in is False else 'blue',
-                 label=f'Linear Regression\nSlope: {slope:.2f}\n'
-                       f'R²: {correlation:.2f}\nNull Point X: {null_point_x:.2f}\nNull Point Y: {intercept:.2f}')
+        #plt.plot(x, regression_line, color='red' if knock_in is False else 'blue')
 
     except (ValueError, TypeError) as e:
         print ("could not calculate linear regression", e)
@@ -235,7 +247,7 @@ def add_linear_regression(x, y, knock_in=False):
 def add_polynomial_fit(x, y, knock_in=False):
     coeffs = np.polyfit(x, y, 3)
     poly = np.poly1d(coeffs)
-    plt.plot(x, poly(x), color='blue' if knock_in is False else 'red', label="Cubic Fit")
+    plt.plot(x, poly(x), color='blue' if knock_in is False else 'red')
     return poly
 
 
@@ -279,17 +291,17 @@ def visualize_trajectories(result, growth_cones, color='blue', trajectory_freq=5
 
 def visualize_trajectory_on_substrate(result, substrate, growth_cones, trajectory_freq=50):
     blended_colors = create_blended_colors(substrate.ligands, substrate.receptors)
-    fig = visualize_image(blended_colors, "Tectum End-positions and Growth Cone Trajectories on Substrate")
+    fig = visualize_image(blended_colors, "")
     x_values, y_values = result.get_final_positioning()
-    plt.plot(x_values, y_values, '*', color='orange', label='Tectum End-positions')
+    plt.plot(x_values, y_values, '*', color='orange', )
 
     for idx, gc in enumerate(growth_cones):
         trajectory_x, trajectory_y = zip(*gc.history.position[::trajectory_freq])
-        plt.plot(trajectory_x, trajectory_y, label=f'Growth Cone {idx}')
+        plt.plot(trajectory_x, trajectory_y, )
 
     # plt.legend()
-    plt.xlabel("n-t Axis of Retina")
-    plt.ylabel("d-v Axis of Retina")
+    # plt.xlabel("n-t Axis of Retina")
+    # plt.ylabel("d-v Axis of Retina")
     return fig
 
 
@@ -411,6 +423,7 @@ def create_halved_projection(gc_scope, substrate_scope):
         # Linear mapping: x = y_min -> 0%, x = y_max -> 100%
         pct = (x - y_min) / (y_max - y_min) * 100
         return f"{pct:.0f}%"
+
     def full_x_range_percentage(x, pos):
         # Linear mapping: x = y_min -> 0%, x = y_max -> 100%
         pct = (x - x_min) / (x_max - x_min) * 100

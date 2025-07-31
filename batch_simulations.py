@@ -16,23 +16,24 @@ from experiments.two_phase import two_phase_experiments
 SWEEPS = {
     # Choose at least one sim-module and one experiment
     # Use Continuous gradients when using two-phase experiment
-    'sim_module': [main, two_phase_experiments],
+    'sim_module': [main],
     'experiments': [
-        "CONTINUOUS_GRADIENTS",
-        "STRIPE",
-        "GAP",
-        "GAP_INV",
-        "SINGLE_MAPPING_CONFIG",
-        "EXPANSION_CONFIG",
-        "COMPRESSION_CONFIG",
-        "MISMATCH_CONFIG",
+        # "CONTINUOUS_GRADIENTS",
+        # "STRIPE",
+        # "GAP",
+        # "GAP_INV",
+        # "SINGLE_MAPPING_CONFIG",
+        # "EXPANSION_CONFIG",
+        # "COMPRESSION_CONFIG",
+        # "MISMATCH_CONFIG",
         "KNOCK_IN_HOM_CONFIG",
-        "KNOCK_IN_HET_CONFIG",
-        "RECEPTOR_STRIPE_CONFIG",
-        "LIGAND_STRIPE_CONFIG"
+        # "KNOCK_IN_HET_CONFIG",
+        # "RECEPTOR_STRIPE_CONFIG",
+        # "LIGAND_STRIPE_CONFIG"
     ],
     # --- Type in folder name for results
-    cfg.FOLDER_PATH: ["Test run of all standards"]
+    cfg.FOLDER_PATH: ["knock_in_new_BA"],
+    cfg.FF_INTER: [False]
 }
 
 # --- Define specific combination of parameters you want to exclusively test
@@ -60,7 +61,6 @@ def run_batch() -> None:
         experiment = combo[idx_exp]
 
         if sim_module == two_phase_experiments and experiment != "CONTINUOUS_GRADIENTS":
-            print(sim_module, experiment)
             continue
 
         # Extract substrate type and load its default config depending on simulation module

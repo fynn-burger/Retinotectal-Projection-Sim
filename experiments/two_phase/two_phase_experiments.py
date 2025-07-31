@@ -3,8 +3,7 @@ from build import object_factory
 from visualization import utils as vz
 from build import utils
 
-
-def run():
+def two_phase_run():
     """
     Polarity reversal experiment with two nasal populations as waves that grow onto substrate in sequential order.
     :return:
@@ -27,7 +26,7 @@ def run():
         gc.freeze = True
     # for polarity reversal, delete temporal gcs -> think about if this is necessary -> why not just use the scope
     gc_len = int(len(simulation_1.growth_cones))
-    #gc_len = int(gc_len/2) # for polarity reversal
+    gc_len = int(gc_len/2) # for polarity reversal
     first_gcs = simulation_1.growth_cones[0:gc_len]
     vz.plot_projection(first_gc_result, simulation_1.substrate, first_gcs,
                        cfg.current_config.get(cfg.SHOW_FIGURES))
@@ -48,12 +47,13 @@ def run():
 
 
     # specify parameters for second gcs
-    cfg.current_config[cfg.GC_SCOPE] = "temporal"
+    cfg.current_config[cfg.GC_SCOPE] = "nasal"
     cfg.current_config[cfg.SUBSTRATE_SCOPE] = "full"
     cfg.current_config[cfg.FF_INTER] = True
     cfg.current_config[cfg.ADAPTATION_ENABLED] = True
     cfg.current_config[cfg.INTERIM_RESULTS] = [1, 50, 100, 200, 400, 600, 800, 1000, 2000, 3000, 4000, 5000, 7500, 10000,
                                                12500]
+    cfg.current_config[cfg.SIGMOID_SHIFT] = 8.25
 
     # run simulation with first (freezed) and second gcs
     simulation_2 = object_factory.build_default()
@@ -70,16 +70,21 @@ def run():
     # vz.plot_results_on_substrate() -> work on visualization
     """
 
-    gcs = first_gcs + simulation_2.growth_cones
+
+    gcs = first_gcs + simulation_2.growth_cones # for expansion! -> what did I meand by that
     simulation_2.growth_cones = gcs
-    # change GC_SCOPE after building simulation such that visualization shows a full tectum -> only for expansion!
-    cfg.current_config[cfg.GC_SCOPE] = "full"
+    # change GC_SCOPE after building simulation such that visualization shows a full tectum -> only for expansion (pre)!
+    # cfg.current_config[cfg.GC_SCOPE] = "full"
     second_gc_result = simulation_2.run()
     vz.plot_projection(second_gc_result, simulation_2.substrate, simulation_2.growth_cones,
                        cfg.current_config.get(cfg.SHOW_FIGURES))
     vz.plot_adaptation_metrics(simulation_2.growth_cones, cfg.current_config.get(cfg.SHOW_FIGURES))
     vz.plot_receptor_adaptation(simulation_2.growth_cones, cfg.current_config.get(cfg.SHOW_FIGURES))
     utils.write_config_to_text(folder_path)
+
+
+def run():
+    two_phase_run()
 
 
 if __name__ == '__main__':
