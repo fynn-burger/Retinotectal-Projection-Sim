@@ -7,9 +7,9 @@ import os
 import numpy as np
 import Visualize_endpoints
 
-ORIENTATIONS = [True, False]                    # “start_from_top” yes / no
-SUBSTRATE_TYPES = ["Double", "ephrin-A", "EphA"]   # your three substrates
-GC_TYPES = ["nasal", "temporal"]                # your two growth‐cone types
+ORIENTATIONS = [True, False]                        # “start_posterior” yes / no
+SUBSTRATE_TYPES = ["Double", "ephrin-A", "EphA"]    # your three substrates
+GC_TYPES = ["nasal", "temporal"]                    # your two growth‐cone types
 
 
 def endpoint_analysis_run():
@@ -20,10 +20,10 @@ def endpoint_analysis_run():
 
     cfg.current_config = cfg.get_default_config(cfg.GAP)
 
-    cfg.current_config[cfg.FOLDER_PATH] = "Full Endpoint-Analysis with 033-1"
+    cfg.current_config[cfg.FOLDER_PATH] = "exp0033-1_8k_new"
     cfg.current_config[cfg.FOLDER_NAME] = "files"
     cfg.current_config[cfg.GC_COUNT] = 13 # use odd number!
-    cfg.current_config[cfg.STEP_NUM] = 30000
+    cfg.current_config[cfg.STEP_NUM] = 8000
     cfg.current_config[cfg.X_STEP_POSSIBILITY] = 0.5
 
     file_path = utils.create_simulation_folder()
@@ -32,20 +32,20 @@ def endpoint_analysis_run():
 
     with open(csv_path, mode="w", newline="") as file:
         writer = csv.writer(file)
-        header = ["substrate_type", "gc_type", "start_from_top", "run_id"]
+        header = ["substrate_type", "gc_type", "start_posterior", "run_id"]
         header += [f"cone_{i}" for i in range(cfg.current_config[cfg.GC_COUNT])]
         writer.writerow(header)
         for substrate_type in SUBSTRATE_TYPES:
             for gc_type in GC_TYPES:
-                for start_from_top in ORIENTATIONS:
-                    start = "from top" if start_from_top else "from bottom"
+                for start_posterior in ORIENTATIONS:
+                    start = "p → a" if start_posterior else "a → p"
                     cfg.current_config[cfg.FOLDER_PATH] = base_path
                     cfg.current_config[cfg.FOLDER_NAME] = f"images_{substrate_type}_{gc_type}_{start}"
                     utils.create_simulation_folder()
 
-                    for i in range(10):  # Run Simulation 10 times
+                    for i in range(3):  # Run Simulation 10 times
                         simulation = object_factory.build_default()
-                        color = manipulate_gcs(simulation.growth_cones, gc_type, start_from_top)
+                        color = manipulate_gcs(simulation.growth_cones, gc_type, start_posterior)
                         manipulate_substrate(simulation.substrate, substrate_type)
 
                         result = simulation.run()
@@ -68,7 +68,7 @@ def endpoint_analysis_run():
     Visualize_endpoints.make_boxplots(csv_path, base_path)
 
 
-def manipulate_gcs(gcs, gc_type, start_from_top=False):
+def manipulate_gcs(gcs, gc_type, start_posterior=False):
     gc_num = 0
     if gc_type == "nasal":
         gc_num = int(cfg.current_config[cfg.GC_COUNT] * 0.25)
@@ -78,11 +78,11 @@ def manipulate_gcs(gcs, gc_type, start_from_top=False):
     ligand = gcs[gc_num].ligand
     receptor = gcs[gc_num].receptor
     for gc in gcs:
-        gc.ligand = ligand
-        gc.receptor = receptor
-        if start_from_top:
+        gc.ligand = gc.outer_ligand_current = ligand
+        gc.receptor = gc.outer_receptor_current = receptor
+        if start_posterior:
             old_x, old_y = gc.pos
-            gc.pos = (int(gc.radius + cfg.current_config[cfg.COLS]), old_y)
+            gc.pos = (int(gc.radius + cfg.current_config[cfg.COLS] - 1), old_y)
             gc.history.position[0] = gc.pos
 
     if gc_type == "nasal":
@@ -96,12 +96,28 @@ def manipulate_substrate(substrate, type):
     receptor_gradient = np.zeros(substrate.cols)
     # linear gradient
     if type == "Double":
-        ligand_gradient = np.linspace(1, 0.33, substrate.cols)
-        receptor_gradient = np.linspace(0.33, 1, substrate.cols)
+        """
+        ligand_gradient = np.linspace(0.033, 0.4835, substrate.cols)
+        receptor_gradient = np.linspace(0.4835, 0.033, substrate.cols)
+        """
+        receptor_gradient = np.linspace(1, 0, substrate.cols) ** 2
+        receptor_gradient = 0.033 + receptor_gradient * (1 - 0.033)
+
+        ligand_gradient = np.linspace(0, 1, substrate.cols) ** 2
+        ligand_gradient = 0.033 + ligand_gradient * (1 - 0.033)
     elif type == "ephrin-A":
-        ligand_gradient = np.linspace(0.33, 1, substrate.cols)
+        """
+        ligand_gradient = np.linspace(0.033, 0.4835, substrate.cols)
+        """
+
+        ligand_gradient = np.linspace(0, 1, substrate.cols) ** 2
+        ligand_gradient = 0.033 + ligand_gradient * (1 - 0.033)
     elif type == "EphA":
-        receptor_gradient = np.linspace(0.33, 1, substrate.cols)
+        """
+        receptor_gradient = np.linspace(0.4835, 0.033, substrate.cols)
+        """
+        receptor_gradient = np.linspace(1, 0, substrate.cols) ** 2
+        receptor_gradient = 0.033 + receptor_gradient * (1 - 0.033)
 
     for row in range(substrate.rows):
         substrate.ligands[row, :] = ligand_gradient
