@@ -8,12 +8,14 @@ This module provides two main functions:
                               cfg.current_config with its path.
 
 - write_config_to_text(folder_path): Writes the key/value pairs from cfg.current_config into a 'config.txt'.
+- build_gc_mask(radius): Creates a mask to calculate gc discretely
 """
 
 import os
 import build.config as cfg
 import datetime
 import subprocess
+import numpy as np
 
 
 def create_simulation_folder():
@@ -90,3 +92,18 @@ def write_config_to_text(folder_path):
     with open(file_path, 'w') as f:
         for key, value in cfg.current_config.items():
             f.write(f"{key}: {value}\n")
+
+
+def build_gc_mask(radius: int) -> np.ndarray:
+    """ build a mask to project growth cones on a discrete coordinate system
+
+    Args:
+        radius: radius of the growth cone.
+
+    Returns:
+        mask: array of True and False values to determine, where growth cones are projected on
+    """
+    coords = np.arange(-radius, radius + 1)
+    X, Y = np.meshgrid(coords, coords, indexing='ij')
+    mask = (X**2 + Y**2) <= radius**2
+    return mask
