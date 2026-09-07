@@ -3,6 +3,7 @@
 .env
 __pycache__/
 *.pyc
+.DS_Store
 .idea/misc.xml
 .idea/other.xml
 .idea/workspace.xml
